@@ -1,0 +1,36 @@
+services:
+  db:
+    image: postgres:alpine
+    container_name: ableplay_db
+    restart: always
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - "5431:5432"
+
+  api:
+    build: ./api
+    container_name: ableplay_api
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: ${DB_URL}
+    ports:
+      - "8081:8081"
+    restart: unless-stopped
+
+  #frontend:
+    #build: ./frontend
+    #container_name: ableplay_frontend
+    #depends_on:
+      #- api
+    #ports:
+      #- "8080:8080"
+    #restart: unless-stopped
+
+volumes:
+  db_data:
