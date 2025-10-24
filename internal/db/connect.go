@@ -3,7 +3,6 @@ package db
 import (
 	"context"
 	"embed"
-	"os"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/jackc/pgx/v5/stdlib"
@@ -13,10 +12,8 @@ import (
 //go:embed migrations/*.sql
 var migrationsEmbed embed.FS
 
-func Connect(ctx context.Context) (*pgxpool.Pool, error) {
-	connStr := os.Getenv("DB_URL")
-
-	config, err := pgxpool.ParseConfig(connStr)
+func Connect(ctx context.Context, dbURL string) (*pgxpool.Pool, error) {
+	config, err := pgxpool.ParseConfig(dbURL)
 	if err != nil {
 		return nil, err
 	}

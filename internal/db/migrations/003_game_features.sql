@@ -4,7 +4,7 @@ CREATE TABLE game_features (
     created_at TIMESTAMP NOT NULL,
     updated_at TIMESTAMP NOT NULL,
     game_id UUID NOT NULL,
-    feature_id UUID UNIQUE NOT NULL,
+    feature_id UUID NOT NULL,
     notes TEXT,
     verified BOOLEAN DEFAULT false,
     FOREIGN KEY(game_id) REFERENCES games (id) ON DELETE CASCADE,

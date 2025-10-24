@@ -2,14 +2,15 @@
 // versions:
 //   sqlc v1.30.0
 
-package sqlc
+package data
 
 import (
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
 type Feature struct {
-	ID          pgtype.UUID      `json:"id"`
+	ID          uuid.UUID        `json:"id"`
 	CreatedAt   pgtype.Timestamp `json:"created_at"`
 	UpdatedAt   pgtype.Timestamp `json:"updated_at"`
 	Name        string           `json:"name"`
@@ -18,7 +19,7 @@ type Feature struct {
 }
 
 type Game struct {
-	ID          pgtype.UUID      `json:"id"`
+	ID          uuid.UUID        `json:"id"`
 	CreatedAt   pgtype.Timestamp `json:"created_at"`
 	UpdatedAt   pgtype.Timestamp `json:"updated_at"`
 	Title       string           `json:"title"`
@@ -30,20 +31,20 @@ type Game struct {
 }
 
 type GameFeature struct {
-	ID        pgtype.UUID      `json:"id"`
+	ID        uuid.UUID        `json:"id"`
 	CreatedAt pgtype.Timestamp `json:"created_at"`
 	UpdatedAt pgtype.Timestamp `json:"updated_at"`
-	GameID    pgtype.UUID      `json:"game_id"`
-	FeatureID pgtype.UUID      `json:"feature_id"`
+	GameID    uuid.UUID        `json:"game_id"`
+	FeatureID uuid.UUID        `json:"feature_id"`
 	Notes     pgtype.Text      `json:"notes"`
 	Verified  pgtype.Bool      `json:"verified"`
 }
 
 type Mod struct {
-	ID          pgtype.UUID      `json:"id"`
+	ID          uuid.UUID        `json:"id"`
 	CreatedAt   pgtype.Timestamp `json:"created_at"`
 	UpdatedAt   pgtype.Timestamp `json:"updated_at"`
-	GameID      pgtype.UUID      `json:"game_id"`
+	GameID      uuid.UUID        `json:"game_id"`
 	Name        string           `json:"name"`
 	Description pgtype.Text      `json:"description"`
 	SourceUrl   pgtype.Text      `json:"source_url"`
