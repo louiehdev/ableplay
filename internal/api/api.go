@@ -3,29 +3,24 @@ package api
 import (
 	"net/http"
 
-	"github.com/louiehdev/ableplay/internal/data"
+	"github.com/louiehdev/ableplay/internal/config"
 )
 
 type apiConfig struct {
-	db *data.Queries
+	*config.AppConfig
 }
 
-func NewService(dbQueries *data.Queries, port string) *http.Server {
-	cfg := apiConfig{db: dbQueries}
+func NewService(app *config.AppConfig) *http.ServeMux {
+	cfg := apiConfig{AppConfig: app}
 	mux := http.NewServeMux()
-
-	//Handlers
-	mux.HandleFunc("GET /api/health", cfg.handlerHealth)
 
 	// Games
 	mux.HandleFunc("GET /api/games", cfg.handlerGetGames)
 	mux.HandleFunc("POST /api/games", cfg.handlerAddGame)
 	mux.HandleFunc("DELETE /api/games/{gameID}", cfg.handlerDeleteGame)
 
-	server := http.Server{
-		Addr:    ":" + port,
-		Handler: mux,
-	}
+	// Utils
+	mux.HandleFunc("GET /api/health", cfg.handlerHealth)
 
-	return &server
+	return mux
 }

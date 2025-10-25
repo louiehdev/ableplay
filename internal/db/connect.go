@@ -18,12 +18,12 @@ func Connect(ctx context.Context, dbURL string) (*pgxpool.Pool, error) {
 		return nil, err
 	}
 
-	db, err := pgxpool.NewWithConfig(ctx, config)
+	pool, err := pgxpool.NewWithConfig(ctx, config)
 	if err != nil {
 		return nil, err
 	}
 
-	return db, nil
+	return pool, nil
 }
 
 func Migrate(pool *pgxpool.Pool) error {

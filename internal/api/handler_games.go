@@ -24,7 +24,7 @@ func (cfg *apiConfig) handlerAddGame(w http.ResponseWriter, r *http.Request) {
 		Description: toPgtypeText(params.Description),
 	}
 
-	game, err := cfg.db.AddGame(r.Context(), gameParams)
+	game, err := cfg.DB.AddGame(r.Context(), gameParams)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, "Unable to add game to database")
 		return
@@ -34,7 +34,7 @@ func (cfg *apiConfig) handlerAddGame(w http.ResponseWriter, r *http.Request) {
 }
 
 func (cfg *apiConfig) handlerGetGames(w http.ResponseWriter, r *http.Request) {
-	games, err := cfg.db.GetGames(r.Context())
+	games, err := cfg.DB.GetGames(r.Context())
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, "Unable to receive games from database")
 	}
@@ -49,7 +49,7 @@ func (cfg *apiConfig) handlerDeleteGame(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	if err := cfg.db.DeleteGame(r.Context(), gameID); err != nil {
+	if err := cfg.DB.DeleteGame(r.Context(), gameID); err != nil {
 		respondWithError(w, http.StatusInternalServerError, "Something went wrong")
 		return
 	}
