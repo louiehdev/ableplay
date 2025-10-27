@@ -16,9 +16,9 @@ import (
 func main() {
 	godotenv.Load()
 	dbURL := os.Getenv("DB_URL")
-	apiPort := os.Getenv("API_PORT")
-	frontendPort := os.Getenv("FRONTEND_PORT")
-	if dbURL == "" || apiPort == "" || frontendPort == "" {
+	port := os.Getenv("PORT")
+	apiBase := os.Getenv("API_BASE")
+	if dbURL == "" || port == "" || apiBase == "" {
 		log.Fatal("Environment variables must be set")
 	}
 	ctx := context.Background()
@@ -32,14 +32,14 @@ func main() {
 	}
 	log.Print("Successfully connected to database!")
 
-	appCfg := config.NewAppConfig(dbConn, apiPort, frontendPort)
+	appCfg := config.NewAppConfig(dbConn, port, apiBase)
 
 	rootMux := http.NewServeMux()
 	rootMux.Handle("/api/", api.NewService(appCfg))
 	rootMux.Handle("/", web.NewService(appCfg))
 
 	server := http.Server{
-		Addr:    ":" + appCfg.APIPort,
+		Addr:    ":" + appCfg.Port,
 		Handler: rootMux,
 	}
 

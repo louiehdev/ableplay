@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgtype"
@@ -58,6 +59,11 @@ func toPgtypeText(s string) pgtype.Text {
 	return pgtype.Text{String: s, Valid: true}
 }
 
-func toPgtypeInt4(i int) pgtype.Int4 {
-	return pgtype.Int4{Int32: int32(i), Valid: true}
+func toPgtypeInt4(i string) pgtype.Int4 {
+	intS, err := strconv.Atoi(i)
+	if err != nil {
+		return pgtype.Int4{Valid: false}
+	}
+
+	return pgtype.Int4{Int32: int32(intS), Valid: true}
 }

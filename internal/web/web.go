@@ -16,6 +16,9 @@ func NewService(app *config.AppConfig) *http.ServeMux {
 
 	// Handlers
 	mux.HandleFunc("GET /", cfg.handlerHome)
+	mux.HandleFunc("GET /games/updateform", cfg.handlerAddGamePlatform)
+	mux.HandleFunc("GET /games/newform", cfg.handlerAddGameForm)
+	mux.HandleFunc("GET /games/list", cfg.handlerGameList)
 
 	return mux
 }

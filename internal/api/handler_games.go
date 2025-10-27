@@ -8,11 +8,17 @@ import (
 )
 
 func (cfg *apiConfig) handlerAddGame(w http.ResponseWriter, r *http.Request) {
-	var params data.AddGameParamsJSON
+	var params data.GameParamsJSON
 	decoder := json.NewDecoder(r.Body)
 	if err := decoder.Decode(&params); err != nil {
 		respondWithError(w, http.StatusInternalServerError, "Something went wrong")
 		return
+	}
+	var gamePlatforms []string
+	for _, platform := range params.Platforms {
+		if platform != "" {
+			gamePlatforms = append(gamePlatforms, platform)
+		}
 	}
 
 	gameParams := data.AddGameParams{
@@ -20,17 +26,18 @@ func (cfg *apiConfig) handlerAddGame(w http.ResponseWriter, r *http.Request) {
 		Developer:   toPgtypeText(params.Developer),
 		Publisher:   toPgtypeText(params.Publisher),
 		ReleaseYear: toPgtypeInt4(params.ReleaseYear),
-		Platforms:   params.Platforms,
+		Platforms:   gamePlatforms,
 		Description: toPgtypeText(params.Description),
 	}
 
-	game, err := cfg.DB.AddGame(r.Context(), gameParams)
+	_, err := cfg.DB.AddGame(r.Context(), gameParams)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, "Unable to add game to database")
 		return
 	}
 
-	respondWithJSON(w, http.StatusCreated, game)
+	w.Header().Set("HX-Trigger", "gameAdded")
+	w.WriteHeader(http.StatusCreated)
 }
 
 func (cfg *apiConfig) handlerGetGames(w http.ResponseWriter, r *http.Request) {

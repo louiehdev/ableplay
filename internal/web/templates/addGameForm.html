@@ -1,0 +1,35 @@
+{{define "addGameForm"}}
+<form hx-ext="json-enc" hx-post="/api/games">
+    <header>
+        <p>Please fill out the form below to add the game to the database.</p>
+    </header>
+    <div>
+        <label for="title">Game Title:</label><br>
+        <input type="text" id="title" name="title"><br>
+        <label for="developer">Developer:</label><br>
+        <input type="text" id="developer" name="developer"><br>
+        <label for="publisher">Publisher:</label><br>
+        <input type="text" id="publisher" name="publisher"><br>
+        <label for="releaseyear">Release Year:</label><br>
+        <input type="number" id="releaseyear" name="release_year"><br>
+        
+        <div id="platforms">   
+            <label for="platforms">Platforms:</label><br>
+            <input type="hidden" name="platforms" value="">
+            <input type="text" name="platforms"><br>
+        </div>
+        <div>
+        <button type="button" hx-get="/games/updateform" hx-target="#platforms" hx-swap="beforeend">
+            + Add Platform
+        </button>
+        </div>
+        <label for="description">Description:</label><br>
+        <input type="text" id="description" name="description"><br>
+    </div>
+    <div class="mt-2">
+    <button type="submit" class="btn btn-primary">
+        Add Game
+    </button>
+    </div>
+</form>
+{{end}}

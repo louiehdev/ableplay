@@ -1,10 +1,10 @@
 package data
 
-type AddGameParamsJSON struct {
+type GameParamsJSON struct {
 	Title       string   `json:"title"`
 	Developer   string   `json:"developer"`
 	Publisher   string   `json:"publisher"`
-	ReleaseYear int      `json:"release_year"`
+	ReleaseYear string   `json:"release_year"`
 	Platforms   []string `json:"platforms"`
 	Description string   `json:"description"`
 }

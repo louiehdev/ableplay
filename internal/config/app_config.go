@@ -8,15 +8,15 @@ import (
 )
 
 type AppConfig struct {
-	DB           *data.Queries
-	Templates    *template.Template
-	APIPort      string
-	FrontendPort string
+	DB        *data.Queries
+	Templates *template.Template
+	Port      string
+	APIBase   string
 }
 
-func NewAppConfig(dbConn *pgxpool.Pool, apiPort, frontendPort string) *AppConfig {
+func NewAppConfig(dbConn *pgxpool.Pool, port, apiBase string) *AppConfig {
 	dbQueries := data.New(dbConn)
 	tmpl := template.Must(template.ParseGlob("./internal/web/templates/*"))
 
-	return &AppConfig{DB: dbQueries, Templates: tmpl, APIPort: apiPort, FrontendPort: frontendPort}
+	return &AppConfig{DB: dbQueries, Templates: tmpl, Port: port, APIBase: apiBase}
 }
