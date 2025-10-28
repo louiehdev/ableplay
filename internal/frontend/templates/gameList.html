@@ -1,0 +1,38 @@
+{{define "gameList"}}
+<table class="table table-bordered">
+  <caption>List of games</caption>
+  <thead>
+    <tr>
+      <th scope="col" class="bg-info">Title</th>
+      <th scope="col" class="bg-info">Release Year</th>
+      <th scope="col" class="bg-info">Description</th>
+      <th scope="col" class="bg-info">Platforms</th>
+      <th scope="col"></th>
+    </tr>
+  </thead>
+{{if .}}
+  <tbody>
+    {{range .}}
+    <tr>
+      <th scope="row">{{.Title}}</th>
+      <td>{{.ReleaseYear}}</td>
+      <td>{{.Description}}</td>
+      <td>
+        {{range $i, $p := .Platforms}}
+          {{if $i}}, {{end}}{{ $p }}
+        {{end}}
+      </td>
+      <input type="hidden" id="game-{{.ID}}" name="id" value="{{.ID}}">
+      <td>
+        <button hx-delete="/games/deletegame" hx-include="#game-{{.ID}}" hx-ext="json-enc" hx-confirm="Are you sure you want to delete this Game?" class="btn btn-danger">
+          Delete
+        </button>
+      </td>
+    </tr>
+    {{end}}
+  </tbody>
+</table>
+{{else}}
+<p>No games found.</p>
+{{end}}
+{{end}}

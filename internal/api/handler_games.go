@@ -8,58 +8,42 @@ import (
 )
 
 func (cfg *apiConfig) handlerAddGame(w http.ResponseWriter, r *http.Request) {
-	var params data.GameParamsJSON
+	var params data.AddGameParams
 	decoder := json.NewDecoder(r.Body)
 	if err := decoder.Decode(&params); err != nil {
-		respondWithError(w, http.StatusInternalServerError, "Something went wrong")
+		data.RespondWithError(w, http.StatusInternalServerError, "Something went wrong")
 		return
 	}
-	var gamePlatforms []string
-	for _, platform := range params.Platforms {
-		if platform != "" {
-			gamePlatforms = append(gamePlatforms, platform)
-		}
-	}
 
-	gameParams := data.AddGameParams{
-		Title:       params.Title,
-		Developer:   toPgtypeText(params.Developer),
-		Publisher:   toPgtypeText(params.Publisher),
-		ReleaseYear: toPgtypeInt4(params.ReleaseYear),
-		Platforms:   gamePlatforms,
-		Description: toPgtypeText(params.Description),
-	}
-
-	_, err := cfg.DB.AddGame(r.Context(), gameParams)
+	_, err := cfg.DB.AddGame(r.Context(), params)
 	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "Unable to add game to database")
+		data.RespondWithError(w, http.StatusInternalServerError, "Unable to add game to database")
 		return
 	}
 
-	w.Header().Set("HX-Trigger", "gameAdded")
 	w.WriteHeader(http.StatusCreated)
 }
 
 func (cfg *apiConfig) handlerGetGames(w http.ResponseWriter, r *http.Request) {
 	games, err := cfg.DB.GetGames(r.Context())
 	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "Unable to receive games from database")
+		data.RespondWithError(w, http.StatusInternalServerError, "Unable to receive games from database")
 	}
 
-	respondWithJSON(w, http.StatusOK, games)
+	data.RespondWithJSON(w, http.StatusOK, games)
 }
 
 func (cfg *apiConfig) handlerDeleteGame(w http.ResponseWriter, r *http.Request) {
-	gameID, err := getRequestUUID(r, "gameID")
+	gameID, err := data.GetRequestUUID(r, "gameID")
 	if err != nil {
-		respondWithError(w, http.StatusNotFound, "Game not found")
+		data.RespondWithError(w, http.StatusNotFound, "Game not found")
 		return
 	}
 
 	if err := cfg.DB.DeleteGame(r.Context(), gameID); err != nil {
-		respondWithError(w, http.StatusInternalServerError, "Something went wrong")
+		data.RespondWithError(w, http.StatusInternalServerError, "Something went wrong")
 		return
 	}
 
-	respondWithError(w, http.StatusNoContent, "Game deleted")
+	w.WriteHeader(http.StatusNoContent)
 }

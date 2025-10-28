@@ -1,4 +1,4 @@
-package api
+package data
 
 import (
 	"encoding/json"
@@ -10,7 +10,7 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
-func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
+func RespondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
 	jsonData, err := json.Marshal(payload)
 	if err != nil {
 		log.Printf("Error marshalling payload: %s", err)
@@ -23,7 +23,7 @@ func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
 	w.Write(jsonData)
 }
 
-func respondWithError(w http.ResponseWriter, code int, errMessage string) {
+func RespondWithError(w http.ResponseWriter, code int, errMessage string) {
 	type errorResponse struct {
 		Error string `json:"error"`
 	}
@@ -43,7 +43,7 @@ func respondWithError(w http.ResponseWriter, code int, errMessage string) {
 	w.Write(errData)
 }
 
-func getRequestUUID(r *http.Request, idType string) (uuid.UUID, error) {
+func GetRequestUUID(r *http.Request, idType string) (uuid.UUID, error) {
 	id := r.PathValue(idType)
 	reqUUID, err := uuid.Parse(id)
 	if err != nil {
@@ -52,18 +52,18 @@ func getRequestUUID(r *http.Request, idType string) (uuid.UUID, error) {
 	return reqUUID, nil
 }
 
-func toPgtypeText(s string) pgtype.Text {
+func ToPgtypeText(s string) pgtype.Text {
 	if s == "" {
 		return pgtype.Text{Valid: false}
 	}
 	return pgtype.Text{String: s, Valid: true}
 }
 
-func toPgtypeInt4(i string) pgtype.Int4 {
-	intS, err := strconv.Atoi(i)
+func ToPgtypeInt4(stringInt string) pgtype.Int4 {
+	i, err := strconv.Atoi(stringInt)
 	if err != nil {
 		return pgtype.Int4{Valid: false}
 	}
 
-	return pgtype.Int4{Int32: int32(intS), Valid: true}
+	return pgtype.Int4{Int32: int32(i), Valid: true}
 }

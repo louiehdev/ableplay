@@ -3,15 +3,17 @@ package api
 import (
 	"net/http"
 
-	"github.com/louiehdev/ableplay/internal/config"
+	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/louiehdev/ableplay/internal/data"
 )
 
 type apiConfig struct {
-	*config.AppConfig
+	DB *data.Queries
 }
 
-func NewService(app *config.AppConfig) *http.ServeMux {
-	cfg := apiConfig{AppConfig: app}
+func NewService(dbConn *pgxpool.Pool) *http.ServeMux {
+	dbQueries := data.New(dbConn)
+	cfg := apiConfig{DB: dbQueries}
 	mux := http.NewServeMux()
 
 	// Games

@@ -61,11 +61,42 @@ func (q *Queries) DeleteGame(ctx context.Context, id uuid.UUID) error {
 	return err
 }
 
+const getGame = `-- name: GetGame :one
+SELECT id, title, developer, publisher, release_year, platforms, description FROM games
+WHERE id = $1
+`
+
+type GetGameRow struct {
+	ID          uuid.UUID   `json:"id"`
+	Title       string      `json:"title"`
+	Developer   pgtype.Text `json:"developer"`
+	Publisher   pgtype.Text `json:"publisher"`
+	ReleaseYear pgtype.Int4 `json:"release_year"`
+	Platforms   []string    `json:"platforms"`
+	Description pgtype.Text `json:"description"`
+}
+
+func (q *Queries) GetGame(ctx context.Context, id uuid.UUID) (GetGameRow, error) {
+	row := q.db.QueryRow(ctx, getGame, id)
+	var i GetGameRow
+	err := row.Scan(
+		&i.ID,
+		&i.Title,
+		&i.Developer,
+		&i.Publisher,
+		&i.ReleaseYear,
+		&i.Platforms,
+		&i.Description,
+	)
+	return i, err
+}
+
 const getGames = `-- name: GetGames :many
-SELECT title, developer, publisher, release_year, platforms, description FROM games
+SELECT id, title, developer, publisher, release_year, platforms, description FROM games
 `
 
 type GetGamesRow struct {
+	ID          uuid.UUID   `json:"id"`
 	Title       string      `json:"title"`
 	Developer   pgtype.Text `json:"developer"`
 	Publisher   pgtype.Text `json:"publisher"`
@@ -84,6 +115,7 @@ func (q *Queries) GetGames(ctx context.Context) ([]GetGamesRow, error) {
 	for rows.Next() {
 		var i GetGamesRow
 		if err := rows.Scan(
+			&i.ID,
 			&i.Title,
 			&i.Developer,
 			&i.Publisher,
@@ -99,4 +131,39 @@ func (q *Queries) GetGames(ctx context.Context) ([]GetGamesRow, error) {
 		return nil, err
 	}
 	return items, nil
+}
+
+const updateGame = `-- name: UpdateGame :exec
+UPDATE games SET 
+    updated_at = NOW(),
+    title = COALESCE($2, title),
+    developer = COALESCE($3, developer),
+    publisher = COALESCE($4, publisher),
+    release_year = COALESCE($5, release_year),
+    platforms = COALESCE($6, platforms),
+    description = COALESCE($7, description)
+WHERE id = $1
+`
+
+type UpdateGameParams struct {
+	ID          uuid.UUID   `json:"id"`
+	Title       string      `json:"title"`
+	Developer   pgtype.Text `json:"developer"`
+	Publisher   pgtype.Text `json:"publisher"`
+	ReleaseYear pgtype.Int4 `json:"release_year"`
+	Platforms   []string    `json:"platforms"`
+	Description pgtype.Text `json:"description"`
+}
+
+func (q *Queries) UpdateGame(ctx context.Context, arg UpdateGameParams) error {
+	_, err := q.db.Exec(ctx, updateGame,
+		arg.ID,
+		arg.Title,
+		arg.Developer,
+		arg.Publisher,
+		arg.ReleaseYear,
+		arg.Platforms,
+		arg.Description,
+	)
+	return err
 }

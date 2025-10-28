@@ -1,6 +1,7 @@
 package data
 
-type GameParamsJSON struct {
+type GamePublic struct {
+	ID          string   `json:"id"`
 	Title       string   `json:"title"`
 	Developer   string   `json:"developer"`
 	Publisher   string   `json:"publisher"`

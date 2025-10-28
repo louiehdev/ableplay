@@ -8,17 +8,14 @@ import (
 
 	"github.com/joho/godotenv"
 	"github.com/louiehdev/ableplay/internal/api"
-	"github.com/louiehdev/ableplay/internal/config"
 	"github.com/louiehdev/ableplay/internal/db"
-	"github.com/louiehdev/ableplay/internal/web"
 )
 
 func main() {
 	godotenv.Load()
 	dbURL := os.Getenv("DB_URL")
-	port := os.Getenv("PORT")
-	apiBase := os.Getenv("API_BASE")
-	if dbURL == "" || port == "" || apiBase == "" {
+	port := os.Getenv("API_PORT")
+	if dbURL == "" || port == "" {
 		log.Fatal("Environment variables must be set")
 	}
 	ctx := context.Background()
@@ -32,15 +29,9 @@ func main() {
 	}
 	log.Print("Successfully connected to database!")
 
-	appCfg := config.NewAppConfig(dbConn, port, apiBase)
-
-	rootMux := http.NewServeMux()
-	rootMux.Handle("/api/", api.NewService(appCfg))
-	rootMux.Handle("/", web.NewService(appCfg))
-
 	server := http.Server{
-		Addr:    ":" + appCfg.Port,
-		Handler: rootMux,
+		Addr:    ":" + port,
+		Handler: api.NewService(dbConn),
 	}
 
 	log.Fatal(server.ListenAndServe())

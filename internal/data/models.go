@@ -5,48 +5,50 @@
 package data
 
 import (
+	"time"
+
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
 type Feature struct {
-	ID          uuid.UUID        `json:"id"`
-	CreatedAt   pgtype.Timestamp `json:"created_at"`
-	UpdatedAt   pgtype.Timestamp `json:"updated_at"`
-	Name        string           `json:"name"`
-	Description pgtype.Text      `json:"description"`
-	Category    pgtype.Text      `json:"category"`
+	ID          uuid.UUID   `json:"id"`
+	CreatedAt   time.Time   `json:"created_at"`
+	UpdatedAt   time.Time   `json:"updated_at"`
+	Name        string      `json:"name"`
+	Description pgtype.Text `json:"description"`
+	Category    pgtype.Text `json:"category"`
 }
 
 type Game struct {
-	ID          uuid.UUID        `json:"id"`
-	CreatedAt   pgtype.Timestamp `json:"created_at"`
-	UpdatedAt   pgtype.Timestamp `json:"updated_at"`
-	Title       string           `json:"title"`
-	Developer   pgtype.Text      `json:"developer"`
-	Publisher   pgtype.Text      `json:"publisher"`
-	ReleaseYear pgtype.Int4      `json:"release_year"`
-	Platforms   []string         `json:"platforms"`
-	Description pgtype.Text      `json:"description"`
+	ID          uuid.UUID   `json:"id"`
+	CreatedAt   time.Time   `json:"created_at"`
+	UpdatedAt   time.Time   `json:"updated_at"`
+	Title       string      `json:"title"`
+	Developer   pgtype.Text `json:"developer"`
+	Publisher   pgtype.Text `json:"publisher"`
+	ReleaseYear pgtype.Int4 `json:"release_year"`
+	Platforms   []string    `json:"platforms"`
+	Description pgtype.Text `json:"description"`
 }
 
 type GameFeature struct {
-	ID        uuid.UUID        `json:"id"`
-	CreatedAt pgtype.Timestamp `json:"created_at"`
-	UpdatedAt pgtype.Timestamp `json:"updated_at"`
-	GameID    uuid.UUID        `json:"game_id"`
-	FeatureID uuid.UUID        `json:"feature_id"`
-	Notes     pgtype.Text      `json:"notes"`
-	Verified  pgtype.Bool      `json:"verified"`
+	ID        uuid.UUID   `json:"id"`
+	CreatedAt time.Time   `json:"created_at"`
+	UpdatedAt time.Time   `json:"updated_at"`
+	GameID    uuid.UUID   `json:"game_id"`
+	FeatureID uuid.UUID   `json:"feature_id"`
+	Notes     pgtype.Text `json:"notes"`
+	Verified  pgtype.Bool `json:"verified"`
 }
 
 type Mod struct {
-	ID          uuid.UUID        `json:"id"`
-	CreatedAt   pgtype.Timestamp `json:"created_at"`
-	UpdatedAt   pgtype.Timestamp `json:"updated_at"`
-	GameID      uuid.UUID        `json:"game_id"`
-	Name        string           `json:"name"`
-	Description pgtype.Text      `json:"description"`
-	SourceUrl   pgtype.Text      `json:"source_url"`
-	Verified    pgtype.Bool      `json:"verified"`
+	ID          uuid.UUID   `json:"id"`
+	CreatedAt   time.Time   `json:"created_at"`
+	UpdatedAt   time.Time   `json:"updated_at"`
+	GameID      uuid.UUID   `json:"game_id"`
+	Name        string      `json:"name"`
+	Description pgtype.Text `json:"description"`
+	SourceUrl   pgtype.Text `json:"source_url"`
+	Verified    pgtype.Bool `json:"verified"`
 }
