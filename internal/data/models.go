@@ -32,23 +32,23 @@ type Game struct {
 	Description pgtype.Text `json:"description"`
 }
 
-type GameFeature struct {
+type GamesFeature struct {
 	ID        uuid.UUID   `json:"id"`
 	CreatedAt time.Time   `json:"created_at"`
 	UpdatedAt time.Time   `json:"updated_at"`
 	GameID    uuid.UUID   `json:"game_id"`
 	FeatureID uuid.UUID   `json:"feature_id"`
 	Notes     pgtype.Text `json:"notes"`
-	Verified  pgtype.Bool `json:"verified"`
+	Verified  bool        `json:"verified"`
 }
 
 type Mod struct {
-	ID          uuid.UUID   `json:"id"`
-	CreatedAt   time.Time   `json:"created_at"`
-	UpdatedAt   time.Time   `json:"updated_at"`
-	GameID      uuid.UUID   `json:"game_id"`
-	Name        string      `json:"name"`
-	Description pgtype.Text `json:"description"`
-	SourceUrl   pgtype.Text `json:"source_url"`
-	Verified    pgtype.Bool `json:"verified"`
+	ID          uuid.UUID `json:"id"`
+	CreatedAt   time.Time `json:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at"`
+	GameID      uuid.UUID `json:"game_id"`
+	Name        string    `json:"name"`
+	Description string    `json:"description"`
+	SourceUrl   string    `json:"source_url"`
+	Verified    bool      `json:"verified"`
 }

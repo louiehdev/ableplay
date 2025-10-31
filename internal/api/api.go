@@ -13,16 +13,25 @@ type apiConfig struct {
 
 func NewService(dbConn *pgxpool.Pool) *http.ServeMux {
 	dbQueries := data.New(dbConn)
-	cfg := apiConfig{DB: dbQueries}
+	api := apiConfig{DB: dbQueries}
 	mux := http.NewServeMux()
 
 	// Games
-	mux.HandleFunc("GET /api/games", cfg.handlerGetGames)
-	mux.HandleFunc("POST /api/games", cfg.handlerAddGame)
-	mux.HandleFunc("DELETE /api/games/{gameID}", cfg.handlerDeleteGame)
+	mux.HandleFunc("GET /api/games/{gameID}", api.handlerGetGame)
+	mux.HandleFunc("GET /api/games", api.handlerGetGames)
+	mux.HandleFunc("POST /api/games", api.handlerAddGame)
+	mux.HandleFunc("PUT /api/games/{gameID}", api.handlerUpdateGame)
+	mux.HandleFunc("DELETE /api/games/{gameID}", api.handlerDeleteGame)
+
+	// Features
+	mux.HandleFunc("GET /api/features/{featureID}", api.handlerGetFeature)
+	mux.HandleFunc("GET /api/features", api.handlerGetFeatures)
+	mux.HandleFunc("POST /api/features", api.handlerAddFeature)
+	mux.HandleFunc("PUT /api/features/{featureID}", api.handlerUpdateFeature)
+	mux.HandleFunc("DELETE /api/features/{featureID}", api.handlerDeleteFeature)
 
 	// Utils
-	mux.HandleFunc("GET /api/health", cfg.handlerHealth)
+	mux.HandleFunc("GET /api/health", api.handlerHealth)
 
 	return mux
 }

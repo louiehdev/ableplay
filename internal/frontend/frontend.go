@@ -21,10 +21,12 @@ func NewService(tmpl *template.Template, apibase string) *http.ServeMux {
 
 	// Handlers
 	mux.HandleFunc("GET /", cfg.handlerHome)
-	mux.HandleFunc("GET /games/updateform", cfg.handlerAddGamePlatform)
+	mux.HandleFunc("GET /games/addformfeature", cfg.handlerAddGamePlatform)
 	mux.HandleFunc("GET /games/newform", cfg.handlerAddGameForm)
+	mux.HandleFunc("GET /games/updateform", cfg.handlerUpdateGameForm)
 	mux.HandleFunc("GET /games/list", cfg.handlerFrontendGetGames)
 	mux.HandleFunc("POST /games/addgame", cfg.handlerFrontendAddGame)
+	mux.HandleFunc("PUT /games/updategame", cfg.handlerFrontendUpdateGame)
 	mux.HandleFunc("DELETE /games/deletegame", cfg.handlerFrontendDeleteGame)
 
 	return mux

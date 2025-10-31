@@ -13,12 +13,12 @@ WHERE id = $1;
 -- name: UpdateGame :exec
 UPDATE games SET 
     updated_at = NOW(),
-    title = COALESCE($2, title),
-    developer = COALESCE($3, developer),
-    publisher = COALESCE($4, publisher),
-    release_year = COALESCE($5, release_year),
-    platforms = COALESCE($6, platforms),
-    description = COALESCE($7, description)
+    title = $2,
+    developer = $3,
+    publisher = $4,
+    release_year = $5,
+    platforms = $6,
+    description = $7
 WHERE id = $1;
 
 -- name: DeleteGame :exec

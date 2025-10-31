@@ -67,3 +67,13 @@ func ToPgtypeInt4(stringInt string) pgtype.Int4 {
 
 	return pgtype.Int4{Int32: int32(i), Valid: true}
 }
+
+func RemoveEmptyValues(stringSlice []string) []string {
+	var cleanSlice []string
+	for _, value := range stringSlice {
+		if value != "" {
+			cleanSlice = append(cleanSlice, value)
+		}
+	}
+	return cleanSlice
+}

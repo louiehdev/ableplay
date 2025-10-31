@@ -5,9 +5,9 @@ CREATE TABLE mods (
     updated_at TIMESTAMP NOT NULL,
     game_id UUID NOT NULL,
     name TEXT NOT NULL,
-    description TEXT,
-    source_url TEXT,
-    verified BOOLEAN DEFAULT false,
+    description TEXT NOT NULL,
+    source_url TEXT NOT NULL,
+    verified BOOLEAN NOT NULL DEFAULT false,
     FOREIGN KEY(game_id) REFERENCES games (id) ON DELETE CASCADE
 );
 
