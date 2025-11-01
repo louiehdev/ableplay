@@ -1,0 +1,36 @@
+{{define "gameListCards"}}
+<div class="row row-cols-3">
+{{if .}}
+  {{range .}}
+    <div class="col">
+      <div class="card">
+        <img src="..." class="card-img-top" alt="...">
+        <div class="card-body">
+          <h5 class="card-title">{{.Title}}</h5>
+          <p class="card-text">{{.Description}}</p>
+        </div>
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item">Release Year: {{.ReleaseYear}}</li>
+          <li class="list-group-item">
+            {{range $i, $p := .Platforms}}
+              {{if $i}}, {{end}}{{ $p }}
+            {{end}}
+          </li>
+        </ul>
+        <div class="card-body">
+          <input type="hidden" id="game-{{.ID}}" name="id" value="{{.ID}}">
+          <button hx-get="/games/updateform" hx-include="#game-{{.ID}}" hx-target="#gameForm" hx-swap="innerHTML" class="btn btn-warning">
+            Update
+          </button>
+          <button hx-delete="/games/delete" hx-include="#game-{{.ID}}" hx-confirm="Are you sure you want to delete this Game?" class="btn btn-danger">
+            Delete
+          </button>
+        </div>
+      </div>
+    </div>
+  {{end}}
+{{else}}
+<p>No games found.</p>
+{{end}}
+</div>
+{{end}}

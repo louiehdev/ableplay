@@ -2,12 +2,17 @@ package frontend
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 
 	"github.com/google/uuid"
 	"github.com/louiehdev/ableplay/internal/data"
 )
+
+func (f *frontendConfig) handlerFrontendGames(w http.ResponseWriter, _ *http.Request) {
+	f.templates.ExecuteTemplate(w, "gamesPage", nil)
+}
 
 func (f *frontendConfig) handlerAddGameForm(w http.ResponseWriter, _ *http.Request) {
 	f.templates.ExecuteTemplate(w, "addGameForm", nil)
@@ -29,7 +34,7 @@ func (f *frontendConfig) handlerUpdateGameForm(w http.ResponseWriter, r *http.Re
 
 	var gameData data.GameData
 	if err := json.NewDecoder(resp.Body).Decode(&gameData); err != nil {
-		data.RespondWithError(w, http.StatusInternalServerError, "Something went wrong: decoding failed")
+		data.RespondWithError(w, http.StatusInternalServerError, fmt.Sprintf("Something went wrong: decoding failed for game: %v", gameID))
 		return
 	}
 
@@ -123,20 +128,13 @@ func (f *frontendConfig) handlerFrontendGetGames(w http.ResponseWriter, r *http.
 			Description: game.Description.String})
 	}
 
-	f.templates.ExecuteTemplate(w, "gameList", gamesList)
+	f.templates.ExecuteTemplate(w, "gameListCards", gamesList)
 }
 
 func (f *frontendConfig) handlerFrontendDeleteGame(w http.ResponseWriter, r *http.Request) {
-	var params struct {
-		ID string `json:"id"`
-	}
-	decoder := json.NewDecoder(r.Body)
-	if err := decoder.Decode(&params); err != nil {
-		data.RespondWithError(w, http.StatusInternalServerError, "Something went wrong")
-		return
-	}
+	gameID := r.URL.Query().Get("id")
 
-	_, resperror := f.callAPI(r.Context(), r.Method, "/api/games/"+params.ID, nil)
+	_, resperror := f.callAPI(r.Context(), r.Method, "/api/games/"+gameID, nil)
 	if resperror != nil {
 		data.RespondWithError(w, http.StatusInternalServerError, "Failed to delete game")
 		return

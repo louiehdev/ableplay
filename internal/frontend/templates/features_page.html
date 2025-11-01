@@ -1,0 +1,14 @@
+{{define "featuresPage"}}
+<div class="row">
+    <div class="col w-auto">
+        <h2>Features</h2>
+        
+        <div id="featureList" hx-get="/features/list" hx-trigger="load, featureAdded from:body, featureUpdated from:body, featureDeleted from:body" hx-swap="innerHTML">
+        </div>
+    </div>
+    <div class="col w-auto">
+        <div id="featureForm" hx-get="/features/newform" hx-trigger="load, featureAdded from:body, featureUpdated from:body" hx-swap="innerHTML">
+        </div>
+    </div>
+</div>
+{{end}}

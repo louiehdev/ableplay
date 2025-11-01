@@ -1,0 +1,33 @@
+{{define "addGameForm"}}
+<form hx-ext="json-enc" hx-post="/games/add">
+    <header>
+        <h2>Add New Game</h2>
+        <p>Please fill out the form below to add the game to the database.</p>
+    </header>
+    <div class="mb-1">
+        <label for="title">Game Title:</label><br>
+        <input class="form-control mb-1" type="text" id="title" name="title"><br>
+        <label for="developer">Developer:</label><br>
+        <input class="form-control" type="text" id="developer" name="developer"><br>
+        <label for="publisher">Publisher:</label><br>
+        <input class="form-control" type="text" id="publisher" name="publisher"><br>
+        <label for="releaseyear">Release Year:</label><br>
+        <input class="form-control" type="number" id="releaseyear" name="release_year"><br>
+        <div id="platforms">
+            <label for="platforms">Platforms:</label><br>
+            <input type="hidden" name="platforms" value="">
+            <input class="form-control" type="text" name="platforms"><br>
+        </div>
+        <button type="button" class="btn btn-secondary btn-sm" hx-get="/games/addformplatform" hx-target="#platforms" hx-swap="beforeend">
+            + Add Platform
+        </button>
+        <label for="description">Description:</label><br>
+        <input class="form-control" type="text" id="description" name="description"><br>
+    </div>
+    <div class="mt-1">
+    <button type="submit" class="btn btn-primary">
+        Add Game
+    </button>
+    </div>
+</form>
+{{end}}

@@ -1,0 +1,14 @@
+{{define "gamesPage"}}
+<div class="row">
+    <div class="col-md-7">
+        <h2>Games</h2>
+        
+        <div id="gameList" hx-get="/games/list" hx-trigger="load, gameAdded from:body, gameUpdated from:body, gameDeleted from:body" hx-swap="innerHTML">
+        </div>
+    </div>
+    <div class="col-md-2 offset-md-1">
+        <div id="gameForm" hx-get="/games/newform" hx-trigger="load, gameAdded from:body, gameUpdated from:body" hx-swap="innerHTML">
+        </div>
+    </div>
+</div>
+{{end}}
