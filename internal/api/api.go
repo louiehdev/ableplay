@@ -30,6 +30,15 @@ func NewService(dbConn *pgxpool.Pool) *http.ServeMux {
 	mux.HandleFunc("PUT /api/features/{featureID}", api.handlerUpdateFeature)
 	mux.HandleFunc("DELETE /api/features/{featureID}", api.handlerDeleteFeature)
 
+	// Game Features
+	mux.HandleFunc("GET /api/games/features", api.handlerGetGamesWithFeatures)
+	mux.HandleFunc("GET /api/games/{gameID}/features", api.handlerGetFeaturesByGame)
+	mux.HandleFunc("GET /api/features/{featureID}/games", api.handlerGetGamesByFeature)
+	mux.HandleFunc("GET /api/games/{gameID}/features/{featureID}", api.handlerGetGameFeature)
+	mux.HandleFunc("POST /api/games/{gameID}/features", api.handlerAddGameFeature)
+	mux.HandleFunc("PUT /api/games/{gameID}/features/{featureID}", api.handlerUpdateGameFeature)
+	mux.HandleFunc("DELETE /api/games/{gameID}/features/{featureID}", api.handlerDeleteGameFeature)
+
 	// Utils
 	mux.HandleFunc("GET /api/health", api.handlerHealth)
 

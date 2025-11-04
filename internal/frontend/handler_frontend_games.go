@@ -10,10 +10,6 @@ import (
 	"github.com/louiehdev/ableplay/internal/data"
 )
 
-func (f *frontendConfig) handlerFrontendGames(w http.ResponseWriter, _ *http.Request) {
-	f.templates.ExecuteTemplate(w, "gamesPage", nil)
-}
-
 func (f *frontendConfig) handlerAddGameForm(w http.ResponseWriter, _ *http.Request) {
 	f.templates.ExecuteTemplate(w, "addGameForm", nil)
 }
@@ -104,31 +100,6 @@ func (f *frontendConfig) handlerFrontendUpdateGame(w http.ResponseWriter, r *htt
 
 	w.Header().Set("HX-Trigger", "gameUpdated")
 	w.WriteHeader(http.StatusNoContent)
-}
-
-func (f *frontendConfig) handlerFrontendGetGames(w http.ResponseWriter, r *http.Request) {
-	resp, err := f.callAPI(r.Context(), r.Method, "/api/games", nil)
-	if err != nil {
-		data.RespondWithError(w, http.StatusInternalServerError, "Failed to fetch games")
-		return
-	}
-	defer resp.Body.Close()
-
-	var games []data.GameData
-	json.NewDecoder(resp.Body).Decode(&games)
-	var gamesList []data.GamePublic
-	for _, game := range games {
-		gamesList = append(gamesList, data.GamePublic{
-			ID:          game.ID.String(),
-			Title:       game.Title,
-			Developer:   game.Developer.String,
-			Publisher:   game.Publisher.String,
-			ReleaseYear: strconv.Itoa(int(game.ReleaseYear.Int32)),
-			Platforms:   game.Platforms,
-			Description: game.Description.String})
-	}
-
-	f.templates.ExecuteTemplate(w, "gameListCards", gamesList)
 }
 
 func (f *frontendConfig) handlerFrontendDeleteGame(w http.ResponseWriter, r *http.Request) {

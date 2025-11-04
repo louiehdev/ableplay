@@ -1,0 +1,38 @@
+{{define "gamefeatureForm"}}
+{{if .}}
+<form hx-ext="json-enc" hx-post="/games/features/add">
+    <header>
+        <h2>Add Feature to Game</h2>
+        <p>Please fill out the form below to connect the accessibility feature to the game in the database.</p>
+    </header>
+    <div class="col-auto">
+        <input type="hidden" id="gameid" name="game_id" value="{{.GameID}}">
+        <div class="form-floating">
+            <input class="form-control" type="text" id="title" name="title" value="{{.GameTitle}}" disabled>
+            <label for="title" class="form-label">Game Title:</label>
+        </div>
+        <div>
+            <label for="features" class="form-label">Features</label>
+            <select class="form-select" id="features" name="feature_id">
+                {{range $i, $p := .FeatureList}}
+                    <option value="{{$p.ID}}">{{$p.Name}}</option>
+                {{end}}
+            </select>
+        </div>
+        <div>
+            <label for="notes" class="form-label">Notes:</label><br>
+            <textarea class="form-control text-wrap" id="notes" name="notes" placeholder="place notes here" rows="3" required></textarea>
+        </div>
+        <div>
+            <input class="form-check-input" type="checkbox" id="verified" name="verified" value="checked">
+            <label for="verified" class="form-check-label">Verified</label>
+        </div>
+    </div>
+    <div class="mt-2">
+    <button type="submit" class="btn btn-primary">
+        Add Feature to Game
+    </button>
+    </div>
+</form>
+{{end}}
+{{end}}

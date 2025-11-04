@@ -1,0 +1,48 @@
+{{define "gamesfeaturesList"}}
+<div class="row row-cols-3">
+{{if .}}
+  {{range $game := .}}
+    <div class="col">
+      <div class="card">
+        <!-- <img src="..." class="card-img-top" alt="..."> -->
+        <div class="card-body">
+          <h5 class="card-title">{{.Title}}</h5>
+          <p class="card-subtitle"><small>{{.Description}}</small></p>
+        </div>
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item">Release Year: {{.ReleaseYear}}</li>
+          <li class="list-group-item">
+            Platforms: 
+            {{range $i, $p := .Platforms}}
+              {{if $i}}, {{end}}{{ $p }}
+            {{end}}
+          </li>
+          <li class="list-group-item">
+            Accessibility Features: 
+            {{range $feature := $game.GameFeatures}}
+              <input type="hidden" id="feature-{{$feature.ID}}" name="feature_id" value="{{$feature.ID}}">
+              <a href="#" class="card-link" hx-get="/games/feature" hx-include="#game-{{$game.ID}}, #feature-{{$feature.ID}}" hx-target="#gameFeature" hx-swap="innerHTML">{{$feature.Name}}</a>
+            {{end}}
+          </li>
+        </ul>
+        <div class="card-body">
+          <input type="hidden" id="game-{{$game.ID}}" name="game_id" value="{{$game.ID}}">
+          <input type="hidden" id="game-{{$game.ID}}-title" name="title" value="{{$game.Title}}">
+          <button hx-get="/games/features/newform" hx-include="#game-{{$game.ID}}, #game-{{$game.ID}}-title" hx-target="#gameForm" hx-swap="innerHTML" class="btn btn-info">
+            Add Feature
+          </button>
+          <button hx-get="/games/updateform" hx-include="#game-{{$game.ID}}" hx-target="#gameForm" hx-swap="innerHTML" class="btn btn-warning">
+            Update
+          </button>
+          <button hx-delete="/games/delete" hx-include="#game-{{$game.ID}}" hx-confirm="Are you sure you want to delete this Game?" class="btn btn-danger">
+            Delete
+          </button>
+        </div>
+      </div>
+    </div>
+  {{end}}
+{{else}}
+<p>No games found.</p>
+{{end}}
+</div>
+{{end}}

@@ -3,8 +3,29 @@ INSERT INTO games (created_at, updated_at, title, developer, publisher, release_
 VALUES (NOW(), NOW(), $1, $2, $3, $4, $5, $6)
 RETURNING *;
 
+-- name: GetGamesWithFeatures :many
+SELECT 
+    games.id,
+    games.title,
+    games.developer,
+    games.publisher,
+    games.release_year,
+    games.platforms,
+    games.description,
+    (
+        SELECT json_agg(json_build_object('id', features.id, 'name', features.name))
+        FROM games_features
+        JOIN features ON features.id = games_features.feature_id
+        WHERE games_features.game_id = games.id
+    ) AS game_features
+FROM games
+ORDER BY games.title;
+
+
 -- name: GetGames :many
-SELECT id, title, developer, publisher, release_year, platforms, description FROM games;
+SELECT id, title, developer, publisher, release_year, platforms, description
+FROM games
+ORDER BY title;
 
 -- name: GetGame :one
 SELECT id, title, developer, publisher, release_year, platforms, description FROM games

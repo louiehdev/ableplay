@@ -1,0 +1,15 @@
+{{define "gamefeatureCard"}}
+{{if .}}
+<div class="card" id="gamefeatureCard">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    {{.Title}}
+    <button type="button" class="btn-close" aria-label="Close" hx-get="#" hx-target="#gamefeatureCard" hx-swap="delete"></button>
+  </div>
+  <div class="card-body">
+    <h5 class="card-title">{{.Name}}</h5>
+    <p class="card-text">{{.Notes}}.</p>
+    <p class="card_text text-muted">{{if .Verified}}Verified{{else}}Not Verified{{end}}</p>
+  </div>
+</div>
+{{end}}
+{{end}}

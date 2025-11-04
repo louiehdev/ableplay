@@ -92,7 +92,9 @@ func (q *Queries) GetGame(ctx context.Context, id uuid.UUID) (GetGameRow, error)
 }
 
 const getGames = `-- name: GetGames :many
-SELECT id, title, developer, publisher, release_year, platforms, description FROM games
+SELECT id, title, developer, publisher, release_year, platforms, description
+FROM games
+ORDER BY title
 `
 
 type GetGamesRow struct {
@@ -122,6 +124,65 @@ func (q *Queries) GetGames(ctx context.Context) ([]GetGamesRow, error) {
 			&i.ReleaseYear,
 			&i.Platforms,
 			&i.Description,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getGamesWithFeatures = `-- name: GetGamesWithFeatures :many
+SELECT 
+    games.id,
+    games.title,
+    games.developer,
+    games.publisher,
+    games.release_year,
+    games.platforms,
+    games.description,
+    (
+        SELECT json_agg(json_build_object('id', features.id, 'name', features.name))
+        FROM games_features
+        JOIN features ON features.id = games_features.feature_id
+        WHERE games_features.game_id = games.id
+    ) AS game_features
+FROM games
+ORDER BY games.title
+`
+
+type GetGamesWithFeaturesRow struct {
+	ID           uuid.UUID   `json:"id"`
+	Title        string      `json:"title"`
+	Developer    pgtype.Text `json:"developer"`
+	Publisher    pgtype.Text `json:"publisher"`
+	ReleaseYear  pgtype.Int4 `json:"release_year"`
+	Platforms    []string    `json:"platforms"`
+	Description  pgtype.Text `json:"description"`
+	GameFeatures []byte      `json:"game_features"`
+}
+
+func (q *Queries) GetGamesWithFeatures(ctx context.Context) ([]GetGamesWithFeaturesRow, error) {
+	rows, err := q.db.Query(ctx, getGamesWithFeatures)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetGamesWithFeaturesRow
+	for rows.Next() {
+		var i GetGamesWithFeaturesRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Title,
+			&i.Developer,
+			&i.Publisher,
+			&i.ReleaseYear,
+			&i.Platforms,
+			&i.Description,
+			&i.GameFeatures,
 		); err != nil {
 			return nil, err
 		}

@@ -77,3 +77,7 @@ func RemoveEmptyValues(stringSlice []string) []string {
 	}
 	return cleanSlice
 }
+
+func IsChecked(s string) bool {
+	return s != ""
+}

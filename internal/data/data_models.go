@@ -6,13 +6,14 @@ import (
 )
 
 type GamePublic struct {
-	ID          string   `json:"id"`
-	Title       string   `json:"title"`
-	Developer   string   `json:"developer"`
-	Publisher   string   `json:"publisher"`
-	ReleaseYear string   `json:"release_year"`
-	Platforms   []string `json:"platforms"`
-	Description string   `json:"description"`
+	ID           string          `json:"id"`
+	Title        string          `json:"title"`
+	Developer    string          `json:"developer"`
+	Publisher    string          `json:"publisher"`
+	ReleaseYear  string          `json:"release_year"`
+	Platforms    []string        `json:"platforms"`
+	Description  string          `json:"description"`
+	GameFeatures []FeaturePublic `json:"game_features"`
 }
 
 type GameData struct {
@@ -37,4 +38,12 @@ type FeatureData struct {
 	Name        string      `json:"name"`
 	Description pgtype.Text `json:"description"`
 	Category    pgtype.Text `json:"category"`
+}
+
+type GameFeaturePublic struct {
+	ID        string `json:"id"`
+	GameID    string `json:"game_id"`
+	FeatureID string `json:"feature_id"`
+	Notes     string `json:"notes"`
+	Verified  string `json:"verified"`
 }

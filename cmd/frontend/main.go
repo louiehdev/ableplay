@@ -14,7 +14,8 @@ func main() {
 	godotenv.Load()
 	port := os.Getenv("WEB_PORT")
 	apiBase := os.Getenv("API_BASE")
-	if port == "" || apiBase == "" {
+	platform := os.Getenv("PLATFORM")
+	if port == "" || apiBase == "" || platform == "" {
 		log.Fatal("Environment variables must be set")
 	}
 
@@ -22,7 +23,7 @@ func main() {
 
 	server := http.Server{
 		Addr:    ":" + port,
-		Handler: frontend.NewService(tmpl, apiBase),
+		Handler: frontend.NewService(tmpl, apiBase, platform),
 	}
 
 	log.Print("Frontend running successfully")

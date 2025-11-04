@@ -47,11 +47,16 @@ func (q *Queries) CreateGameFeature(ctx context.Context, arg CreateGameFeaturePa
 
 const deleteGameFeature = `-- name: DeleteGameFeature :exec
 DELETE FROM games_features
-WHERE id = $1
+WHERE game_id = $1 AND feature_id = $2
 `
 
-func (q *Queries) DeleteGameFeature(ctx context.Context, id uuid.UUID) error {
-	_, err := q.db.Exec(ctx, deleteGameFeature, id)
+type DeleteGameFeatureParams struct {
+	GameID    uuid.UUID `json:"game_id"`
+	FeatureID uuid.UUID `json:"feature_id"`
+}
+
+func (q *Queries) DeleteGameFeature(ctx context.Context, arg DeleteGameFeatureParams) error {
+	_, err := q.db.Exec(ctx, deleteGameFeature, arg.GameID, arg.FeatureID)
 	return err
 }
 
@@ -100,6 +105,41 @@ func (q *Queries) GetFeaturesByGame(ctx context.Context, gameID uuid.UUID) ([]Ge
 		return nil, err
 	}
 	return items, nil
+}
+
+const getGameFeature = `-- name: GetGameFeature :one
+SELECT
+    games_features.notes, games_features.verified,
+    games.title,
+    features.name
+FROM games_features
+JOIN games ON games_features.game_id = games.id
+JOIN features ON games_features.feature_id = features.id
+WHERE games_features.game_id = $1 AND games_features.feature_id = $2
+`
+
+type GetGameFeatureParams struct {
+	GameID    uuid.UUID `json:"game_id"`
+	FeatureID uuid.UUID `json:"feature_id"`
+}
+
+type GetGameFeatureRow struct {
+	Notes    pgtype.Text `json:"notes"`
+	Verified bool        `json:"verified"`
+	Title    string      `json:"title"`
+	Name     string      `json:"name"`
+}
+
+func (q *Queries) GetGameFeature(ctx context.Context, arg GetGameFeatureParams) (GetGameFeatureRow, error) {
+	row := q.db.QueryRow(ctx, getGameFeature, arg.GameID, arg.FeatureID)
+	var i GetGameFeatureRow
+	err := row.Scan(
+		&i.Notes,
+		&i.Verified,
+		&i.Title,
+		&i.Name,
+	)
+	return i, err
 }
 
 const getGamesByFeature = `-- name: GetGamesByFeature :many
@@ -153,4 +193,35 @@ func (q *Queries) GetGamesByFeature(ctx context.Context, featureID uuid.UUID) ([
 		return nil, err
 	}
 	return items, nil
+}
+
+const updateGameFeature = `-- name: UpdateGameFeature :exec
+UPDATE games_features SET
+    updated_at = NOW(),
+    game_id = $3,
+    feature_id = $4,
+    notes = $5,
+    verified = $6
+WHERE game_id = $1 AND feature_id = $2
+`
+
+type UpdateGameFeatureParams struct {
+	GameID      uuid.UUID   `json:"game_id"`
+	FeatureID   uuid.UUID   `json:"feature_id"`
+	GameID_2    uuid.UUID   `json:"game_id_2"`
+	FeatureID_2 uuid.UUID   `json:"feature_id_2"`
+	Notes       pgtype.Text `json:"notes"`
+	Verified    bool        `json:"verified"`
+}
+
+func (q *Queries) UpdateGameFeature(ctx context.Context, arg UpdateGameFeatureParams) error {
+	_, err := q.db.Exec(ctx, updateGameFeature,
+		arg.GameID,
+		arg.FeatureID,
+		arg.GameID_2,
+		arg.FeatureID_2,
+		arg.Notes,
+		arg.Verified,
+	)
+	return err
 }

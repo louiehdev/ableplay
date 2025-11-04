@@ -111,11 +111,10 @@ func (q *Queries) GetFeatures(ctx context.Context) ([]GetFeaturesRow, error) {
 const updateFeature = `-- name: UpdateFeature :exec
 UPDATE features SET 
     updated_at = NOW(),
-    name = COALESCE($2, name),
-    description = COALESCE($3, description),
-    category = COALESCE($4, category)
+    name = $2,
+    description = $3,
+    category = $4
 WHERE id = $1
-    AND ($2 <> name OR $3 <> description OR $4 <> category)
 `
 
 type UpdateFeatureParams struct {

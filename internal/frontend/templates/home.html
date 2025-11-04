@@ -13,12 +13,13 @@
         <nav class="nav nav-pills nav-fill">
             <button class="nav-link active" data-bs-toggle="pill" hx-get="/games" hx-target="#content" hx-swap="innerHTML">Games</button>
             <button class="nav-link" data-bs-toggle="pill" hx-get="/features" hx-target="#content" hx-swap="innerHTML">Features</button>
-            <button class="nav-link" data-bs-toggle="pill" hx-get="/gamefeatures" hx-target="#content" hx-swap="innerHTML">Game Features</button>
             <button class="nav-link disabled" data-bs-toggle="pill" aria-disabled="true">Mods</button>
         </nav>
 
         <div>
-            <button type="button" class="btn btn-success btn-sm" hx-get="/initialize">Dev: Initialize</button>
+            {{if eq .Platform "dev"}}
+                <button type="button" class="btn btn-success btn-sm" hx-get="/initializedemo">Dev: Initialize Demo Data</button>
+            {{end}}
         </div>
     
         <div class="container-fluid p-3" id="content" hx-get="/games" hx-trigger="load" hx-swap="innerHTML">
