@@ -1,7 +1,6 @@
 package main
 
 import (
-	"html/template"
 	"log"
 	"net/http"
 	"os"
@@ -19,7 +18,7 @@ func main() {
 		log.Fatal("Environment variables must be set")
 	}
 
-	tmpl := template.Must(template.ParseGlob("./internal/frontend/templates/*"))
+	var tmpl = frontend.LoadTemplates()
 
 	server := http.Server{
 		Addr:    ":" + port,

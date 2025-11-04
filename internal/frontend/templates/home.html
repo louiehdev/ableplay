@@ -16,9 +16,9 @@
             <button class="nav-link disabled" data-bs-toggle="pill" aria-disabled="true">Mods</button>
         </nav>
 
-        <div>
-            {{if eq .Platform "dev"}}
-                <button type="button" class="btn btn-success btn-sm" hx-get="/initializedemo">Dev: Initialize Demo Data</button>
+        <div id="demoButton">
+            {{if eq .Platform "demo"}}
+                <button type="button" class="btn btn-success btn-sm" hx-get="/demo" hx-target="#demoButton" hx-swap="delete">Dev: Initialize Demo Data</button>
             {{end}}
         </div>
     

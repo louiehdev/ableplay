@@ -1,13 +1,13 @@
 package frontend
 
 import (
-	"bytes"
-	"context"
-	"encoding/json"
+	"embed"
 	"html/template"
-	"io"
 	"net/http"
 )
+
+//go:embed templates/*.html
+var templates embed.FS
 
 type frontendConfig struct {
 	templates  *template.Template
@@ -22,7 +22,7 @@ func NewService(tmpl *template.Template, apibase, platform string) *http.ServeMu
 
 	// Handlers
 	mux.HandleFunc("GET /", cfg.handlerHome)
-	mux.HandleFunc("GET /initializedemo", cfg.handlerInitializeDemoData)
+	mux.HandleFunc("GET /demo", cfg.handlerInitializeDemoData)
 
 	// Games
 	mux.HandleFunc("GET /games/", cfg.handlerFrontendGameFeatures)
@@ -51,25 +51,6 @@ func NewService(tmpl *template.Template, apibase, platform string) *http.ServeMu
 	return mux
 }
 
-func (f *frontendConfig) callAPI(ctx context.Context, method, path string, payload any) (*http.Response, error) {
-	var body io.Reader
-	if payload != nil {
-		b, err := json.Marshal(payload)
-		if err != nil {
-			return nil, err
-		}
-		body = bytes.NewBuffer(b)
-	}
-	req, err := http.NewRequestWithContext(ctx, method, f.apiBase+path, body)
-	if err != nil {
-		return nil, err
-	}
-	req.Header.Set("Content-Type", "application/json")
-
-	resp, err := f.httpClient.Do(req)
-	if err != nil {
-		return nil, err
-	}
-
-	return resp, nil
+func LoadTemplates() *template.Template {
+	return template.Must(template.ParseFS(templates, "templates/*.html"))
 }

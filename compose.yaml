@@ -1,38 +1,45 @@
 services:
   db:
     image: postgres:alpine
-    container_name: ableplay_db
-    restart: always
+    container_name: ableplay-db
+    restart: unless-stopped
     environment:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_NAME}
-    #volumes:
-      #- db_data:/var/lib/postgresql/data
     ports:
       - "5431:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
 
   api:
     build:
       context: .
-      dockerfile: ./cmd/server/Dockerfile
-    container_name: ableplay_api
+      dockerfile: cmd/backend/Dockerfile
+    container_name: ableplay-api
+    restart: unless-stopped
     depends_on:
       - db
     environment:
-      DATABASE_URL: ${DB_URL}
+      DB_URL: postgres://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}?sslmode=disable
+      API_PORT: 9633
     ports:
-      - "${PORT}:${PORT}"
+      - "9633:9633"
+
+  frontend:
+    build:
+      context: .
+      dockerfile: cmd/frontend/Dockerfile
+    container_name: ableplay-frontend
     restart: unless-stopped
+    depends_on:
+      - api
+    environment:
+      API_BASE: http://api:9633
+      WEB_PORT: 9634
+      PLATFORM: demo
+    ports:
+      - "9634:9634"
 
-  #frontend:
-    #build: ./frontend
-    #container_name: ableplay_frontend
-    #depends_on:
-      #- api
-    #ports:
-      #- "8080:8080"
-    #restart: unless-stopped
-
-#volumes:
-  #db_data:
+volumes:
+  db_data:

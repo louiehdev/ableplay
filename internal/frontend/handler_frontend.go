@@ -1,6 +1,10 @@
 package frontend
 
 import (
+	"bytes"
+	"context"
+	"encoding/json"
+	"io"
 	"net/http"
 
 	"github.com/louiehdev/ableplay/internal/data"
@@ -30,4 +34,27 @@ func (f *frontendConfig) handlerInitializeDemoData(w http.ResponseWriter, r *htt
 	}
 
 	w.WriteHeader(http.StatusOK)
+}
+
+func (f *frontendConfig) callAPI(ctx context.Context, method, path string, payload any) (*http.Response, error) {
+	var body io.Reader
+	if payload != nil {
+		b, err := json.Marshal(payload)
+		if err != nil {
+			return nil, err
+		}
+		body = bytes.NewBuffer(b)
+	}
+	req, err := http.NewRequestWithContext(ctx, method, f.apiBase+path, body)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Content-Type", "application/json")
+
+	resp, err := f.httpClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
 }
