@@ -23,7 +23,7 @@ WHERE games_features.game_id = $1;
 
 -- name: GetGamesByFeature :many
 SELECT 
-    games_features.id, games_features.notes, games_features.verified,
+    games_features.notes, games_features.verified,
     games.id AS game_id, games.title, games.developer, games.publisher, games.release_year, games.platforms, games.description
 FROM games_features
 INNER JOIN games ON games_features.game_id = games.id

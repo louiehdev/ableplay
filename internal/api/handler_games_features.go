@@ -38,7 +38,7 @@ func (api *apiConfig) handlerDeleteGameFeature(w http.ResponseWriter, r *http.Re
 	}
 
 	if err := api.DB.DeleteGameFeature(r.Context(), data.DeleteGameFeatureParams{GameID: gameID, FeatureID: featureID}); err != nil {
-		data.RespondWithError(w, http.StatusInternalServerError, "Something went wrong")
+		data.RespondWithError(w, http.StatusInternalServerError, "Unable to delete game feature from database")
 		return
 	}
 

@@ -23,6 +23,7 @@ func NewService(tmpl *template.Template, apibase, platform string) *http.ServeMu
 	// Handlers
 	mux.HandleFunc("GET /", cfg.handlerHome)
 	mux.HandleFunc("GET /demo", cfg.handlerInitializeDemoData)
+	mux.HandleFunc("GET /documentation", cfg.handlerDocumentation)
 
 	// Games
 	mux.HandleFunc("GET /games/", cfg.handlerFrontendGameFeatures)
@@ -47,6 +48,7 @@ func NewService(tmpl *template.Template, apibase, platform string) *http.ServeMu
 	mux.HandleFunc("GET /games/features/newform", cfg.handlerGameFeatureForm)
 	mux.HandleFunc("GET /games/features/list", cfg.handlerFrontendGetGamesFeatures)
 	mux.HandleFunc("POST /games/features/add", cfg.handlerFrontendAddGameFeature)
+	mux.HandleFunc("DELETE /games/features/delete", cfg.handlerFrontendDeleteGameFeature)
 
 	return mux
 }

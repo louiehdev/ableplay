@@ -30,6 +30,7 @@ type Game struct {
 	ReleaseYear pgtype.Int4 `json:"release_year"`
 	Platforms   []string    `json:"platforms"`
 	Description pgtype.Text `json:"description"`
+	Slug        pgtype.Text `json:"slug"`
 }
 
 type GamesFeature struct {

@@ -93,7 +93,7 @@ func (f *frontendConfig) handlerFrontendGetGameFeature(w http.ResponseWriter, r 
 		Title:    gamefeatureData.Title,
 		Name:     gamefeatureData.Name}
 
-	f.templates.ExecuteTemplate(w, "gamefeatureCard", gameFeature)
+	f.templates.ExecuteTemplate(w, "gamefeaturePopover", gameFeature)
 }
 
 func (f *frontendConfig) handlerFrontendGetGamesFeatures(w http.ResponseWriter, r *http.Request) {
@@ -108,7 +108,7 @@ func (f *frontendConfig) handlerFrontendGetGamesFeatures(w http.ResponseWriter, 
 	json.NewDecoder(resp.Body).Decode(&gamesData)
 	var gamesList []data.GamePublic
 	for _, game := range gamesData {
-		var gameFeatures []data.FeaturePublic
+		var gameFeatures []data.GameFeatureData
 		json.Unmarshal(game.GameFeatures, &gameFeatures)
 		gamesList = append(gamesList, data.GamePublic{
 			ID:           game.ID.String(),
@@ -121,4 +121,18 @@ func (f *frontendConfig) handlerFrontendGetGamesFeatures(w http.ResponseWriter, 
 			GameFeatures: gameFeatures})
 	}
 	f.templates.ExecuteTemplate(w, "gamesfeaturesList", gamesList)
+}
+
+func (f *frontendConfig) handlerFrontendDeleteGameFeature(w http.ResponseWriter, r *http.Request) {
+	gameID := r.URL.Query().Get("game_id")
+	featureID := r.URL.Query().Get("feature_id")
+
+	_, err := f.callAPI(r.Context(), r.Method, "/api/games/"+gameID+"/features/"+featureID, nil)
+	if err != nil {
+		data.RespondWithError(w, http.StatusInternalServerError, "Failed to fetch game feature")
+		return
+	}
+
+	w.Header().Set("HX-Trigger", "gamefeatureDeleted")
+	w.WriteHeader(http.StatusNoContent)
 }

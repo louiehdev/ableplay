@@ -144,7 +144,7 @@ func (q *Queries) GetGameFeature(ctx context.Context, arg GetGameFeatureParams) 
 
 const getGamesByFeature = `-- name: GetGamesByFeature :many
 SELECT 
-    games_features.id, games_features.notes, games_features.verified,
+    games_features.notes, games_features.verified,
     games.id AS game_id, games.title, games.developer, games.publisher, games.release_year, games.platforms, games.description
 FROM games_features
 INNER JOIN games ON games_features.game_id = games.id
@@ -152,7 +152,6 @@ WHERE games_features.feature_id = $1
 `
 
 type GetGamesByFeatureRow struct {
-	ID          uuid.UUID   `json:"id"`
 	Notes       pgtype.Text `json:"notes"`
 	Verified    bool        `json:"verified"`
 	GameID      uuid.UUID   `json:"game_id"`
@@ -174,7 +173,6 @@ func (q *Queries) GetGamesByFeature(ctx context.Context, featureID uuid.UUID) ([
 	for rows.Next() {
 		var i GetGamesByFeatureRow
 		if err := rows.Scan(
-			&i.ID,
 			&i.Notes,
 			&i.Verified,
 			&i.GameID,

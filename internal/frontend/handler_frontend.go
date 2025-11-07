@@ -36,6 +36,10 @@ func (f *frontendConfig) handlerInitializeDemoData(w http.ResponseWriter, r *htt
 	w.WriteHeader(http.StatusOK)
 }
 
+func (f *frontendConfig) handlerDocumentation(w http.ResponseWriter, _ *http.Request) {
+	f.templates.ExecuteTemplate(w, "apiDocs", nil)
+}
+
 func (f *frontendConfig) callAPI(ctx context.Context, method, path string, payload any) (*http.Response, error) {
 	var body io.Reader
 	if payload != nil {

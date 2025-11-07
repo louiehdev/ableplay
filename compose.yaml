@@ -21,7 +21,9 @@ services:
     depends_on:
       - db
     environment:
-      DB_URL: postgres://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}?sslmode=disable
+      DB_PORT: 5432
+      DB_HOST: db
+      DB_URL: postgres://${DB_USER}:${DB_PASSWORD}@db:${DB_PORT}/${DB_NAME}?sslmode=disable
       API_PORT: 9633
     ports:
       - "9633:9633"
@@ -35,7 +37,8 @@ services:
     depends_on:
       - api
     environment:
-      API_BASE: http://api:9633
+      API_HOST: api
+      API_BASE: http://${API_HOST}:${API_PORT}
       WEB_PORT: 9634
       PLATFORM: demo
     ports:

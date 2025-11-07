@@ -13,9 +13,10 @@ import (
 )
 
 const addGame = `-- name: AddGame :one
-INSERT INTO games (created_at, updated_at, title, developer, publisher, release_year, platforms, description)
-VALUES (NOW(), NOW(), $1, $2, $3, $4, $5, $6)
-RETURNING id, created_at, updated_at, title, developer, publisher, release_year, platforms, description
+INSERT INTO games (created_at, updated_at, title, developer, publisher, release_year, platforms, description, slug)
+VALUES (NOW(), NOW(), $1, $2, $3, $4, $5, $6, $7)
+ON CONFLICT (slug) DO NOTHING
+RETURNING id, created_at, updated_at, title, developer, publisher, release_year, platforms, description, slug
 `
 
 type AddGameParams struct {
@@ -25,6 +26,7 @@ type AddGameParams struct {
 	ReleaseYear pgtype.Int4 `json:"release_year"`
 	Platforms   []string    `json:"platforms"`
 	Description pgtype.Text `json:"description"`
+	Slug        pgtype.Text `json:"slug"`
 }
 
 func (q *Queries) AddGame(ctx context.Context, arg AddGameParams) (Game, error) {
@@ -35,6 +37,7 @@ func (q *Queries) AddGame(ctx context.Context, arg AddGameParams) (Game, error) 
 		arg.ReleaseYear,
 		arg.Platforms,
 		arg.Description,
+		arg.Slug,
 	)
 	var i Game
 	err := row.Scan(
@@ -47,6 +50,7 @@ func (q *Queries) AddGame(ctx context.Context, arg AddGameParams) (Game, error) 
 		&i.ReleaseYear,
 		&i.Platforms,
 		&i.Description,
+		&i.Slug,
 	)
 	return i, err
 }
@@ -145,7 +149,7 @@ SELECT
     games.platforms,
     games.description,
     (
-        SELECT json_agg(json_build_object('id', features.id, 'name', features.name))
+        SELECT json_agg(json_build_object('id', features.id, 'name', features.name, 'title', games.title, 'notes', games_features.notes, 'verified', games_features.verified))
         FROM games_features
         JOIN features ON features.id = games_features.feature_id
         WHERE games_features.game_id = games.id

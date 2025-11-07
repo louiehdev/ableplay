@@ -1,8 +1,8 @@
-{{define "gamesfeaturesList"}}
+{{define "gamesbyfeatureList"}}
 <div class="row row-cols-3">
 {{range $game := .}}
   <div class="col">
-    {{template "gameCard" $game}}
+    {{template "gamefeatureCard" $game}}
   </div>
 {{else}}
 <p>No games found.</p>

@@ -6,14 +6,14 @@ import (
 )
 
 type GamePublic struct {
-	ID           string          `json:"id"`
-	Title        string          `json:"title"`
-	Developer    string          `json:"developer"`
-	Publisher    string          `json:"publisher"`
-	ReleaseYear  string          `json:"release_year"`
-	Platforms    []string        `json:"platforms"`
-	Description  string          `json:"description"`
-	GameFeatures []FeaturePublic `json:"game_features"`
+	ID           string            `json:"id"`
+	Title        string            `json:"title"`
+	Developer    string            `json:"developer"`
+	Publisher    string            `json:"publisher"`
+	ReleaseYear  string            `json:"release_year"`
+	Platforms    []string          `json:"platforms"`
+	Description  string            `json:"description"`
+	GameFeatures []GameFeatureData `json:"game_features"`
 }
 
 type GameData struct {
@@ -41,9 +41,30 @@ type FeatureData struct {
 }
 
 type GameFeaturePublic struct {
-	ID        string `json:"id"`
-	GameID    string `json:"game_id"`
 	FeatureID string `json:"feature_id"`
+	GameID    string `json:"game_id"`
+	Name      string `json:"name"`
 	Notes     string `json:"notes"`
 	Verified  string `json:"verified"`
+}
+
+type GameFeatureData struct {
+	FeatureID string `json:"id"`
+	Title     string `json:"title"`
+	Name      string `json:"name"`
+	Notes     string `json:"notes"`
+	Verified  bool   `json:"verified"`
+}
+
+type GameByFeaturePublic struct {
+	FeatureID   string   `json:"feature_id"`
+	GameID      string   `json:"game_id"`
+	Notes       string   `json:"notes"`
+	Verified    bool     `json:"verified"`
+	Title       string   `json:"title"`
+	Developer   string   `json:"developer"`
+	Publisher   string   `json:"publisher"`
+	ReleaseYear string   `json:"release_year"`
+	Platforms   []string `json:"platforms"`
+	Description string   `json:"description"`
 }

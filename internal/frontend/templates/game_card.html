@@ -1,0 +1,51 @@
+{{define "gameCard"}}
+<div class="card">
+    <!-- <img src="..." class="card-img-top" alt="..."> -->
+    <div class="card-body">
+        <h5 class="card-title">{{.Title}}</h5>
+        <p class="card-subtitle"><small>{{.Description}}</small></p>
+    </div>
+    <ul class="list-group list-group-flush">
+        <li class="list-group-item">Release Year: {{.ReleaseYear}}</li>
+        <li class="list-group-item">
+        Platforms: 
+        {{range $i, $p := .Platforms}}
+            {{if $i}},{{end}}
+            {{ $p }}
+        {{end}}
+        </li>
+        <li class="list-group-item">
+        Accessibility Features: 
+        {{range $feature := .GameFeatures}}
+            <a tabindex="0" 
+                class="card-link" 
+                data-bs-toggle="popover" 
+                data-bs-trigger="focus" 
+                data-bs-title="{{.Title}}" 
+                data-bs-content="{{$feature.Notes}} <small text-secondary>{{if $feature.Verified}}Verified{{else}}Not Verified{{end}}</small>" 
+                data-bs-html="true">
+                {{$feature.Name}}
+            </a>
+
+            <script>
+                var pop = document.querySelector('[data-bs-toggle="popover"]');
+                new bootstrap.Popover(pop);
+            </script>
+        {{end}}
+        </li>
+    </ul>
+    <div class="card-body">
+        <input type="hidden" id="game-{{.ID}}" name="game_id" value="{{.ID}}">
+        <input type="hidden" id="game-{{.ID}}-title" name="title" value="{{.Title}}">
+        <button hx-get="/games/features/newform" hx-include="#game-{{.ID}}, #game-{{.ID}}-title" hx-target="#gameForm" hx-swap="innerHTML" class="btn btn-info">
+        Add Feature
+        </button>
+        <button hx-get="/games/updateform" hx-include="#game-{{.ID}}" hx-target="#gameForm" hx-swap="innerHTML" class="btn btn-warning">
+        Update
+        </button>
+        <button hx-delete="/games/delete" hx-include="#game-{{.ID}}" hx-confirm="Are you sure you want to delete this Game?" class="btn btn-danger">
+        Delete
+        </button>
+    </div>
+</div>
+{{end}}

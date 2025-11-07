@@ -1,6 +1,7 @@
 -- name: AddGame :one
-INSERT INTO games (created_at, updated_at, title, developer, publisher, release_year, platforms, description)
-VALUES (NOW(), NOW(), $1, $2, $3, $4, $5, $6)
+INSERT INTO games (created_at, updated_at, title, developer, publisher, release_year, platforms, description, slug)
+VALUES (NOW(), NOW(), $1, $2, $3, $4, $5, $6, $7)
+ON CONFLICT (slug) DO NOTHING
 RETURNING *;
 
 -- name: GetGamesWithFeatures :many
@@ -13,7 +14,7 @@ SELECT
     games.platforms,
     games.description,
     (
-        SELECT json_agg(json_build_object('id', features.id, 'name', features.name))
+        SELECT json_agg(json_build_object('id', features.id, 'name', features.name, 'title', games.title, 'notes', games_features.notes, 'verified', games_features.verified))
         FROM games_features
         JOIN features ON features.id = games_features.feature_id
         WHERE games_features.game_id = games.id
