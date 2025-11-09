@@ -1,35 +1,13 @@
-{{define "featureList"}}
-<table class="table table-bordered">
-  <caption>List of features</caption>
+{{define "featuresList"}}
+<div class="row row-cols-3">
 {{if .}}
-  <thead>
-    <tr>
-      <th scope="col" class="bg-info">Name</th>
-      <th scope="col" class="bg-info">Description</th>
-      <th scope="col" class="bg-info">Category</th>
-      <th scope="col" class="bg-info"></th>
-    </tr>
-  </thead>
-  <tbody>
-    {{range .}}
-    <tr>
-      <th scope="row">{{.Name}}</th>
-      <td>{{.Description}}</td>
-      <td>{{.Category}}</td>
-      <input type="hidden" id="feature-{{.ID}}" name="id" value="{{.ID}}">
-      <td>
-        <button hx-get="/features/updateform" hx-include="#feature-{{.ID}}" hx-target="#featureForm" hx-swap="innerHTML" class="btn btn-warning">
-          Update
-        </button>
-        <button hx-delete="/features/delete" hx-include="#feature-{{.ID}}" hx-confirm="Are you sure you want to delete this Feature?" class="btn btn-danger">
-          Delete
-        </button>
-      </td>
-    </tr>
-    {{end}}
-  </tbody>
-</table>
+  {{range .}}
+    <div class="col">
+      {{template "featureCard" .}}
+    </div>
+  {{end}}
 {{else}}
-<p>No features found.</p>
+  <p>No features found.</p>
 {{end}}
+</div>
 {{end}}

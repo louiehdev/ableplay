@@ -76,7 +76,7 @@ type GetFeaturesByGameRow struct {
 	FeatureID   uuid.UUID   `json:"feature_id"`
 	Name        string      `json:"name"`
 	Description pgtype.Text `json:"description"`
-	Category    pgtype.Text `json:"category"`
+	Category    string      `json:"category"`
 }
 
 func (q *Queries) GetFeaturesByGame(ctx context.Context, gameID uuid.UUID) ([]GetFeaturesByGameRow, error) {

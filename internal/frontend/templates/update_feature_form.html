@@ -1,15 +1,19 @@
-{{define "addFeatureForm"}}
-<form hx-ext="json-enc" hx-post="/features/add">
+{{define "updateFeatureForm"}}
+<form hx-ext="json-enc" hx-put="/features/update">
     <header>
-        <h2>Add New Feature</h2>
-        <p>Please fill out the form below to add the feature to the database.</p>
+        <h2>Update Feature</h2>
+        <p>Please fill out the form below to update the feature in the database.</p>
     </header>
     <div>
+        <input type="hidden" id="id" name="id" value="{{.ID}}">
+        
         <label for="name">Feature Name:</label><br>
-        <input class="form-control" type="text" id="name" name="name"><br>
+        <input type="text" id="name" name="name" value="{{.Name}}"><br>
+        
         <label for="description">Description:</label><br>
-        <input class="form-control" type="text" id="description" name="description"><br>
-        <label for="category">Category:</label><br>
+        <input type="text" id="description" name="description" value="{{.Description}}"><br>
+        
+        <label for="category">Category:</label>
         <select class="form-select" id="category" name="category">
             <option value="Visual">Visual</option>
             <option value="Audio">Audio</option>
@@ -19,7 +23,7 @@
     </div>
     <div class="mt-2">
     <button type="submit" class="btn btn-outline-primary">
-        Add Feature
+        Update Feature
     </button>
     </div>
 </form>

@@ -14,7 +14,7 @@ SELECT
     games.platforms,
     games.description,
     (
-        SELECT json_agg(json_build_object('id', features.id, 'name', features.name, 'title', games.title, 'notes', games_features.notes, 'verified', games_features.verified))
+        SELECT json_agg(json_build_object('id', features.id, 'name', features.name, 'notes', games_features.notes, 'verified', games_features.verified))
         FROM games_features
         JOIN features ON features.id = games_features.feature_id
         WHERE games_features.game_id = games.id
@@ -22,6 +22,31 @@ SELECT
 FROM games
 ORDER BY games.title;
 
+-- name: GetGamesSearch :many
+SELECT 
+    games.id,
+    games.title,
+    games.developer,
+    games.publisher,
+    games.release_year,
+    games.platforms,
+    games.description,
+    (
+        SELECT json_agg(json_build_object('id', features.id, 'name', features.name, 'notes', games_features.notes, 'verified', games_features.verified))
+        FROM games_features
+        JOIN features ON features.id = games_features.feature_id
+        WHERE games_features.game_id = games.id
+    ) AS game_features
+FROM games
+WHERE 
+    games.title ILIKE CONCAT('%', $1::text, '%')
+    OR games.developer ILIKE CONCAT('%', $1::text, '%')
+    OR EXISTS (
+        SELECT 1
+        FROM unnest(games.platforms) AS platform
+        WHERE platform ILIKE CONCAT('%', $1::text, '%')
+    )
+ORDER BY games.title;
 
 -- name: GetGames :many
 SELECT id, title, developer, publisher, release_year, platforms, description

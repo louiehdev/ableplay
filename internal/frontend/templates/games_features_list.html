@@ -1,11 +1,13 @@
-{{define "gamesfeaturesList"}}
+{{define "gamesList"}}
 <div class="row row-cols-3">
-{{range $game := .}}
-  <div class="col">
-    {{template "gameCard" $game}}
-  </div>
+{{if .}}
+  {{range .}}
+    <div class="col">
+      {{template "gameCard" .}}
+    </div>
+  {{end}}
 {{else}}
-<p>No games found.</p>
+  <p>No games found.</p>
 {{end}}
 </div>
 {{end}}

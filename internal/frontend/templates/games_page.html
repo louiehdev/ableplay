@@ -1,0 +1,18 @@
+{{define "gamesPage"}}
+<div class="row">
+    <div class="d-flex justify-content-start align-items-center">
+        <h2 class="pe-4">Games</h2>
+        <button hx-get="/games/newform" hx-target="#gamesForm" hx-swap="innerHTML" class="btn btn-outline-info">
+            Add New Game
+        </button>
+    </div>
+    <div class="col-md-7">
+        <div id="gamesList" hx-get="/games/features/list" hx-trigger="load, gameAdded from:body, gameUpdated from:body, gameDeleted from:body, gamefeatureAdded from:body" hx-swap="innerHTML">
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div id="gamesForm">
+        </div>
+    </div>
+</div>
+{{end}}

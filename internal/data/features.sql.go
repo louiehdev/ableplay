@@ -13,15 +13,16 @@ import (
 )
 
 const addFeature = `-- name: AddFeature :one
-INSERT INTO features (created_at, updated_at, name, description, category)
-VALUES (NOW(), NOW(), $1, $2, $3)
-RETURNING id, created_at, updated_at, name, description, category
+INSERT INTO features (created_at, updated_at, name, description, category, slug)
+VALUES (NOW(), NOW(), $1, $2, $3, LOWER(REPLACE(CONCAT($1::text, '-', $3::text), ' ', '-')))
+ON CONFLICT (slug) DO NOTHING
+RETURNING id, created_at, updated_at, name, description, category, slug
 `
 
 type AddFeatureParams struct {
 	Name        string      `json:"name"`
 	Description pgtype.Text `json:"description"`
-	Category    pgtype.Text `json:"category"`
+	Category    string      `json:"category"`
 }
 
 func (q *Queries) AddFeature(ctx context.Context, arg AddFeatureParams) (Feature, error) {
@@ -34,6 +35,7 @@ func (q *Queries) AddFeature(ctx context.Context, arg AddFeatureParams) (Feature
 		&i.Name,
 		&i.Description,
 		&i.Category,
+		&i.Slug,
 	)
 	return i, err
 }
@@ -57,7 +59,7 @@ type GetFeatureRow struct {
 	ID          uuid.UUID   `json:"id"`
 	Name        string      `json:"name"`
 	Description pgtype.Text `json:"description"`
-	Category    pgtype.Text `json:"category"`
+	Category    string      `json:"category"`
 }
 
 func (q *Queries) GetFeature(ctx context.Context, id uuid.UUID) (GetFeatureRow, error) {
@@ -73,14 +75,16 @@ func (q *Queries) GetFeature(ctx context.Context, id uuid.UUID) (GetFeatureRow, 
 }
 
 const getFeatures = `-- name: GetFeatures :many
-SELECT id, name, description, category FROM features
+SELECT id, name, description, category 
+FROM features
+ORDER BY category
 `
 
 type GetFeaturesRow struct {
 	ID          uuid.UUID   `json:"id"`
 	Name        string      `json:"name"`
 	Description pgtype.Text `json:"description"`
-	Category    pgtype.Text `json:"category"`
+	Category    string      `json:"category"`
 }
 
 func (q *Queries) GetFeatures(ctx context.Context) ([]GetFeaturesRow, error) {
@@ -92,6 +96,47 @@ func (q *Queries) GetFeatures(ctx context.Context) ([]GetFeaturesRow, error) {
 	var items []GetFeaturesRow
 	for rows.Next() {
 		var i GetFeaturesRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Description,
+			&i.Category,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getFeaturesSearch = `-- name: GetFeaturesSearch :many
+SELECT id, name, description, category 
+FROM features
+WHERE 
+    name ILIKE CONCAT('%', $1::text, '%')
+    OR category ILIKE CONCAT('%', $1::text, '%')
+ORDER BY category
+`
+
+type GetFeaturesSearchRow struct {
+	ID          uuid.UUID   `json:"id"`
+	Name        string      `json:"name"`
+	Description pgtype.Text `json:"description"`
+	Category    string      `json:"category"`
+}
+
+func (q *Queries) GetFeaturesSearch(ctx context.Context, dollar_1 string) ([]GetFeaturesSearchRow, error) {
+	rows, err := q.db.Query(ctx, getFeaturesSearch, dollar_1)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetFeaturesSearchRow
+	for rows.Next() {
+		var i GetFeaturesSearchRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.Name,
@@ -121,7 +166,7 @@ type UpdateFeatureParams struct {
 	ID          uuid.UUID   `json:"id"`
 	Name        string      `json:"name"`
 	Description pgtype.Text `json:"description"`
-	Category    pgtype.Text `json:"category"`
+	Category    string      `json:"category"`
 }
 
 func (q *Queries) UpdateFeature(ctx context.Context, arg UpdateFeatureParams) error {

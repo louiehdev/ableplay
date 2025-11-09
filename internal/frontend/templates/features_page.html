@@ -1,13 +1,17 @@
 {{define "featuresPage"}}
 <div class="row">
-    <div class="col w-auto">
-        <h2>Features</h2>
-        
-        <div id="featureList" hx-get="/features/list" hx-trigger="load, featureAdded from:body, featureUpdated from:body, featureDeleted from:body" hx-swap="innerHTML">
+    <div class="d-flex justify-content-start align-items-center">
+        <h2 class="pe-4">Features</h2>
+        <button hx-get="/features/newform" hx-target="#featuresForm" hx-swap="innerHTML" class="btn btn-outline-info">
+            Add New Feature
+        </button>
+    </div>
+    <div class="col-md-7">
+        <div id="featuresList" hx-get="/features/list" hx-trigger="load, featureAdded from:body, featureUpdated from:body, featureDeleted from:body" hx-swap="innerHTML">
         </div>
     </div>
-    <div class="col w-auto">
-        <div id="featureForm" hx-get="/features/newform" hx-trigger="load, featureAdded from:body, featureUpdated from:body" hx-swap="innerHTML">
+    <div class="col-md-2">
+        <div id="featuresForm">
         </div>
     </div>
 </div>

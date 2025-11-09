@@ -17,7 +17,8 @@ type Feature struct {
 	UpdatedAt   time.Time   `json:"updated_at"`
 	Name        string      `json:"name"`
 	Description pgtype.Text `json:"description"`
-	Category    pgtype.Text `json:"category"`
+	Category    string      `json:"category"`
+	Slug        pgtype.Text `json:"slug"`
 }
 
 type Game struct {

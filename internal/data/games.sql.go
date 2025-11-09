@@ -139,6 +139,73 @@ func (q *Queries) GetGames(ctx context.Context) ([]GetGamesRow, error) {
 	return items, nil
 }
 
+const getGamesSearch = `-- name: GetGamesSearch :many
+SELECT 
+    games.id,
+    games.title,
+    games.developer,
+    games.publisher,
+    games.release_year,
+    games.platforms,
+    games.description,
+    (
+        SELECT json_agg(json_build_object('id', features.id, 'name', features.name, 'notes', games_features.notes, 'verified', games_features.verified))
+        FROM games_features
+        JOIN features ON features.id = games_features.feature_id
+        WHERE games_features.game_id = games.id
+    ) AS game_features
+FROM games
+WHERE 
+    games.title ILIKE CONCAT('%', $1::text, '%')
+    OR games.developer ILIKE CONCAT('%', $1::text, '%')
+    OR EXISTS (
+        SELECT 1
+        FROM unnest(games.platforms) AS platform
+        WHERE platform ILIKE CONCAT('%', $1::text, '%')
+    )
+ORDER BY games.title
+`
+
+type GetGamesSearchRow struct {
+	ID           uuid.UUID   `json:"id"`
+	Title        string      `json:"title"`
+	Developer    pgtype.Text `json:"developer"`
+	Publisher    pgtype.Text `json:"publisher"`
+	ReleaseYear  pgtype.Int4 `json:"release_year"`
+	Platforms    []string    `json:"platforms"`
+	Description  pgtype.Text `json:"description"`
+	GameFeatures []byte      `json:"game_features"`
+}
+
+func (q *Queries) GetGamesSearch(ctx context.Context, dollar_1 string) ([]GetGamesSearchRow, error) {
+	rows, err := q.db.Query(ctx, getGamesSearch, dollar_1)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetGamesSearchRow
+	for rows.Next() {
+		var i GetGamesSearchRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Title,
+			&i.Developer,
+			&i.Publisher,
+			&i.ReleaseYear,
+			&i.Platforms,
+			&i.Description,
+			&i.GameFeatures,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getGamesWithFeatures = `-- name: GetGamesWithFeatures :many
 SELECT 
     games.id,
@@ -149,7 +216,7 @@ SELECT
     games.platforms,
     games.description,
     (
-        SELECT json_agg(json_build_object('id', features.id, 'name', features.name, 'title', games.title, 'notes', games_features.notes, 'verified', games_features.verified))
+        SELECT json_agg(json_build_object('id', features.id, 'name', features.name, 'notes', games_features.notes, 'verified', games_features.verified))
         FROM games_features
         JOIN features ON features.id = games_features.feature_id
         WHERE games_features.game_id = games.id

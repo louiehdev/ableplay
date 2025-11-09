@@ -43,7 +43,20 @@ func (api *apiConfig) handlerGetGame(w http.ResponseWriter, r *http.Request) {
 func (api *apiConfig) handlerGetGames(w http.ResponseWriter, r *http.Request) {
 	games, err := api.DB.GetGames(r.Context())
 	if err != nil {
-		data.RespondWithError(w, http.StatusInternalServerError, "Unable to receive games from database")
+		data.RespondWithError(w, http.StatusInternalServerError, "Unable to retrieve games from database")
+		return
+	}
+
+	data.RespondWithJSON(w, http.StatusOK, games)
+}
+
+func (api *apiConfig) handlerSearchGames(w http.ResponseWriter, r *http.Request) {
+	query := r.URL.Query().Get("q")
+
+	games, err := api.DB.GetGamesSearch(r.Context(), query)
+	if err != nil {
+		data.RespondWithError(w, http.StatusInternalServerError, "Unable to find matching games from database")
+		return
 	}
 
 	data.RespondWithJSON(w, http.StatusOK, games)

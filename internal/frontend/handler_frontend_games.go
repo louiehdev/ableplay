@@ -103,10 +103,10 @@ func (f *frontendConfig) handlerFrontendUpdateGame(w http.ResponseWriter, r *htt
 }
 
 func (f *frontendConfig) handlerFrontendDeleteGame(w http.ResponseWriter, r *http.Request) {
-	gameID := r.URL.Query().Get("id")
+	gameID := r.PathValue("gameID")
 
-	_, resperror := f.callAPI(r.Context(), r.Method, "/api/games/"+gameID, nil)
-	if resperror != nil {
+	_, err := f.callAPI(r.Context(), r.Method, "/api/games/"+gameID, nil)
+	if err != nil {
 		data.RespondWithError(w, http.StatusInternalServerError, "Failed to delete game")
 		return
 	}

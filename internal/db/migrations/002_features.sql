@@ -5,7 +5,7 @@ CREATE TABLE features (
     updated_at TIMESTAMP NOT NULL,
     name TEXT NOT NULL,
     description TEXT,
-    category TEXT CHECK (category IN ('Visual', 'Audio', 'Motor', 'Cognitive'))
+    category TEXT NOT NULL CHECK (category IN ('Visual', 'Audio', 'Motor', 'Cognitive'))
 );
 
 -- +goose Down

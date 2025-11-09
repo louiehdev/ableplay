@@ -1,10 +1,21 @@
 -- name: AddFeature :one
-INSERT INTO features (created_at, updated_at, name, description, category)
-VALUES (NOW(), NOW(), $1, $2, $3)
+INSERT INTO features (created_at, updated_at, name, description, category, slug)
+VALUES (NOW(), NOW(), $1, $2, $3, LOWER(REPLACE(CONCAT($1::text, '-', $3::text), ' ', '-')))
+ON CONFLICT (slug) DO NOTHING
 RETURNING *;
 
+-- name: GetFeaturesSearch :many
+SELECT id, name, description, category 
+FROM features
+WHERE 
+    name ILIKE CONCAT('%', $1::text, '%')
+    OR category ILIKE CONCAT('%', $1::text, '%')
+ORDER BY category;
+
 -- name: GetFeatures :many
-SELECT id, name, description, category FROM features;
+SELECT id, name, description, category 
+FROM features
+ORDER BY category;
 
 -- name: GetFeature :one
 SELECT id, name, description, category FROM features

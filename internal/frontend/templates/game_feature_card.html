@@ -1,31 +1,32 @@
 {{define "gamefeatureCard"}}
 {{if .}}
-<div class="card" id="gamefeatureCard">
-  <div class="card-header d-flex justify-content-between align-items-center">
-    {{.Name}}
-    <button type="button" class="btn-close" aria-label="Close" hx-delete="/games/features/delete" hx-include="#game-{{.GameID}}, #feature-{{.FeatureID}}" hx-target="#gamefeatureCard" hx-swap="delete" hx-confirm="Are you sure you want to delete this feature from this game?"></button>
+{{$game := .}}
+<div class="card">
+  <div class="card-header d-flex justify-content-end align-items-center">
+    <button type="button" class="btn-close" aria-label="Close" hx-delete="/games/features/delete" hx-include="#game-{{$game.GameID}}, #feature-{{$game.FeatureID}}" hx-target="#gamefeatureCard" hx-swap="delete" hx-confirm="Are you sure you want to delete this feature from this game?"></button>
   </div>
   <div class="card-body">
-    <h5 class="card-title">{{.Title}}</h5>
-    <ul class="list-group list-group-flush">
-      <li class="list-group-item">Release Year: {{.ReleaseYear}}</li>
-      <li class="list-group-item">
-        Platforms: 
-        {{range $i, $p := .Platforms}}
-          {{if $i}}, {{end}}{{ $p }}
-        {{end}}
-      </li>
-      <li class="list-group-item">{{.Notes}}.</li>
-    </ul>
-    <div class="card-body">
-      <input type="hidden" id="game-{{.GameID}}" name="game_id" value="{{.GameID}}">
-      <input type="hidden" id="feature-{{.FeatureID}}" name="feature_id" value="{{.FeatureID}}">
-      <button hx-get="/games/features/updateform" hx-include="#game-{{.GameID}}" hx-target="#formContent" hx-swap="innerHTML" class="btn btn-warning">
-        Update
-      </button>
-    </div>
-    <p class="card_text text-muted">{{if .Verified}}Verified{{else}}Not Verified{{end}}</p>
+    <h5 class="card-title">{{$game.Title}}</h5>
   </div>
+  <ul class="list-group list-group-flush">
+    <li class="list-group-item">Release Year: {{$game.ReleaseYear}}</li>
+    <li class="list-group-item">
+      Platforms: 
+      {{range $i, $p := $game.Platforms}}
+        {{if $i}},{{end}}
+        {{ $p }}
+      {{end}}
+    </li>
+    <li class="list-group-item">{{$game.Notes}}.</li>
+  </ul>
+  <div class="card-body">
+    <input type="hidden" id="game-{{$game.GameID}}" name="game_id" value="{{$game.GameID}}">
+    <input type="hidden" id="feature-{{$game.FeatureID}}" name="feature_id" value="{{$game.FeatureID}}">
+    <button hx-get="/games/features/updateform" hx-include="#game-{{$game.GameID}}" hx-target="#featuresForm" hx-swap="innerHTML" class="btn btn-outline-secondary">
+      Update
+    </button>
+  </div>
+  <p class="card_text text-muted">{{if $game.Verified}}Verified{{else}}Not Verified{{end}}</p>
 </div>
 {{end}}
 {{end}}

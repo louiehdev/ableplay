@@ -9,16 +9,102 @@ import (
 	"github.com/louiehdev/ableplay/internal/data"
 )
 
-func (f *frontendConfig) handlerFrontendGameFeatures(w http.ResponseWriter, _ *http.Request) {
+func (f *frontendConfig) handlerFrontendGamesFeatures(w http.ResponseWriter, _ *http.Request) {
 	f.templates.ExecuteTemplate(w, "gamesPage", nil)
 }
 
-func (f *frontendConfig) handlerGameFeatureForm(w http.ResponseWriter, r *http.Request) {
+func (f *frontendConfig) handlerFrontendGetGameFeature(w http.ResponseWriter, r *http.Request) {
+	gameID := r.URL.Query().Get("game_id")
+	featureID := r.URL.Query().Get("feature_id")
+
+	resp, err := f.callAPI(r.Context(), r.Method, "/api/games/"+gameID+"/features/"+featureID, nil)
+	if err != nil {
+		data.RespondWithError(w, http.StatusInternalServerError, "Failed to fetch game feature")
+		return
+	}
+	defer resp.Body.Close()
+
+	var gamefeatureData data.GetGameFeatureRow
+	json.NewDecoder(resp.Body).Decode(&gamefeatureData)
+	gameFeature := struct {
+		Notes    string `json:"notes"`
+		Verified bool   `json:"verified"`
+		Title    string `json:"title"`
+		Name     string `json:"name"`
+	}{
+		Notes:    gamefeatureData.Notes.String,
+		Verified: gamefeatureData.Verified,
+		Title:    gamefeatureData.Title,
+		Name:     gamefeatureData.Name}
+
+	f.templates.ExecuteTemplate(w, "gamefeatureCard", gameFeature)
+}
+
+func (f *frontendConfig) handlerFrontendGetGamesFeatures(w http.ResponseWriter, r *http.Request) {
+	resp, err := f.callAPI(r.Context(), r.Method, "/api/games/features", nil)
+	if err != nil {
+		data.RespondWithError(w, http.StatusInternalServerError, "Failed to fetch games")
+		return
+	}
+	defer resp.Body.Close()
+
+	var gamesData []data.GetGamesWithFeaturesRow
+	json.NewDecoder(resp.Body).Decode(&gamesData)
+	var gamesList []data.GamePublic
+	for _, game := range gamesData {
+		var gameFeatures []data.GameFeatureData
+		json.Unmarshal(game.GameFeatures, &gameFeatures)
+		gamesList = append(gamesList, data.GamePublic{
+			ID:           game.ID.String(),
+			Title:        game.Title,
+			Developer:    game.Developer.String,
+			Publisher:    game.Publisher.String,
+			ReleaseYear:  strconv.Itoa(int(game.ReleaseYear.Int32)),
+			Platforms:    game.Platforms,
+			Description:  game.Description.String,
+			GameFeatures: gameFeatures})
+	}
+	f.templates.ExecuteTemplate(w, "gamesList", gamesList)
+}
+
+func (f *frontendConfig) handlerFrontendGetGamesByFeature(w http.ResponseWriter, r *http.Request) {
+	featureID := r.URL.Query().Get("feature_id")
+
+	resp, err := f.callAPI(r.Context(), r.Method, "/api/features/"+featureID+"/games", nil)
+	if err != nil {
+		data.RespondWithError(w, http.StatusInternalServerError, "Failed to fetch games using feature id")
+		return
+	}
+	defer resp.Body.Close()
+
+	var gamesData []data.GetGamesByFeatureRow
+	json.NewDecoder(resp.Body).Decode(&gamesData)
+	var gamesList []data.GameByFeaturePublic
+	for _, game := range gamesData {
+		gamesList = append(gamesList, data.GameByFeaturePublic{
+			FeatureID:   featureID,
+			GameID:      game.GameID.String(),
+			Notes:       game.Notes.String,
+			Verified:    game.Verified,
+			Title:       game.Title,
+			Developer:   game.Developer.String,
+			Publisher:   game.Publisher.String,
+			ReleaseYear: strconv.Itoa(int(game.ReleaseYear.Int32)),
+			Platforms:   game.Platforms,
+			Description: game.Description.String})
+	}
+
+	if err := f.templates.ExecuteTemplate(w, "gamesbyfeatureList", gamesList); err != nil {
+		data.RespondWithError(w, http.StatusInternalServerError, err.Error())
+	}
+}
+
+func (f *frontendConfig) handlerAddGameFeatureForm(w http.ResponseWriter, r *http.Request) {
 	gameID := r.URL.Query().Get("game_id")
 	gameTitle := r.URL.Query().Get("title")
 
-	resp, resperror := f.callAPI(r.Context(), r.Method, "/api/features", nil)
-	if resperror != nil {
+	resp, err := f.callAPI(r.Context(), r.Method, "/api/features", nil)
+	if err != nil {
 		data.RespondWithError(w, http.StatusInternalServerError, "Failed to fetch features")
 		return
 	}
@@ -39,7 +125,7 @@ func (f *frontendConfig) handlerGameFeatureForm(w http.ResponseWriter, r *http.R
 		FeatureList []data.FeaturePublic
 	}{GameID: gameID, GameTitle: gameTitle, FeatureList: featureList}
 
-	f.templates.ExecuteTemplate(w, "gamefeatureForm", formData)
+	f.templates.ExecuteTemplate(w, "addGameFeatureForm", formData)
 }
 
 func (f *frontendConfig) handlerFrontendAddGameFeature(w http.ResponseWriter, r *http.Request) {
@@ -67,60 +153,6 @@ func (f *frontendConfig) handlerFrontendAddGameFeature(w http.ResponseWriter, r 
 
 	w.Header().Set("HX-Trigger", "gamefeatureAdded")
 	w.WriteHeader(http.StatusCreated)
-}
-
-func (f *frontendConfig) handlerFrontendGetGameFeature(w http.ResponseWriter, r *http.Request) {
-	gameID := r.URL.Query().Get("game_id")
-	featureID := r.URL.Query().Get("feature_id")
-
-	resp, err := f.callAPI(r.Context(), r.Method, "/api/games/"+gameID+"/features/"+featureID, nil)
-	if err != nil {
-		data.RespondWithError(w, http.StatusInternalServerError, "Failed to fetch game feature")
-		return
-	}
-	defer resp.Body.Close()
-
-	var gamefeatureData data.GetGameFeatureRow
-	json.NewDecoder(resp.Body).Decode(&gamefeatureData)
-	gameFeature := struct {
-		Notes    string `json:"notes"`
-		Verified bool   `json:"verified"`
-		Title    string `json:"title"`
-		Name     string `json:"name"`
-	}{
-		Notes:    gamefeatureData.Notes.String,
-		Verified: gamefeatureData.Verified,
-		Title:    gamefeatureData.Title,
-		Name:     gamefeatureData.Name}
-
-	f.templates.ExecuteTemplate(w, "gamefeaturePopover", gameFeature)
-}
-
-func (f *frontendConfig) handlerFrontendGetGamesFeatures(w http.ResponseWriter, r *http.Request) {
-	resp, err := f.callAPI(r.Context(), r.Method, "/api/games/features", nil)
-	if err != nil {
-		data.RespondWithError(w, http.StatusInternalServerError, "Failed to fetch games")
-		return
-	}
-	defer resp.Body.Close()
-
-	var gamesData []data.GetGamesWithFeaturesRow
-	json.NewDecoder(resp.Body).Decode(&gamesData)
-	var gamesList []data.GamePublic
-	for _, game := range gamesData {
-		var gameFeatures []data.GameFeatureData
-		json.Unmarshal(game.GameFeatures, &gameFeatures)
-		gamesList = append(gamesList, data.GamePublic{
-			ID:           game.ID.String(),
-			Title:        game.Title,
-			Developer:    game.Developer.String,
-			Publisher:    game.Publisher.String,
-			ReleaseYear:  strconv.Itoa(int(game.ReleaseYear.Int32)),
-			Platforms:    game.Platforms,
-			Description:  game.Description.String,
-			GameFeatures: gameFeatures})
-	}
-	f.templates.ExecuteTemplate(w, "gamesfeaturesList", gamesList)
 }
 
 func (f *frontendConfig) handlerFrontendDeleteGameFeature(w http.ResponseWriter, r *http.Request) {

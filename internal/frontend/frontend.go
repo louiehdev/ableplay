@@ -22,17 +22,18 @@ func NewService(tmpl *template.Template, apibase, platform string) *http.ServeMu
 
 	// Handlers
 	mux.HandleFunc("GET /", cfg.handlerHome)
-	mux.HandleFunc("GET /demo", cfg.handlerInitializeDemoData)
 	mux.HandleFunc("GET /documentation", cfg.handlerDocumentation)
+	mux.HandleFunc("GET /search", cfg.handlerSearch)
 
 	// Games
-	mux.HandleFunc("GET /games/", cfg.handlerFrontendGameFeatures)
+	mux.HandleFunc("GET /games", cfg.handlerFrontendGamesFeatures)
+	mux.HandleFunc("GET /games/", cfg.handlerFrontendGamesFeatures)
 	mux.HandleFunc("GET /games/addformplatform", cfg.handlerAddGamePlatform)
 	mux.HandleFunc("GET /games/newform", cfg.handlerAddGameForm)
 	mux.HandleFunc("GET /games/updateform", cfg.handlerUpdateGameForm)
 	mux.HandleFunc("POST /games/add", cfg.handlerFrontendAddGame)
 	mux.HandleFunc("PUT /games/update", cfg.handlerFrontendUpdateGame)
-	mux.HandleFunc("DELETE /games/delete", cfg.handlerFrontendDeleteGame)
+	mux.HandleFunc("DELETE /games/{gameID}", cfg.handlerFrontendDeleteGame)
 
 	// Features
 	mux.HandleFunc("GET /features", cfg.handlerFrontendFeatures)
@@ -41,12 +42,13 @@ func NewService(tmpl *template.Template, apibase, platform string) *http.ServeMu
 	mux.HandleFunc("GET /features/list", cfg.handlerFrontendGetFeatures)
 	mux.HandleFunc("POST /features/add", cfg.handlerFrontendAddFeature)
 	mux.HandleFunc("PUT /features/update", cfg.handlerFrontendUpdateFeature)
-	mux.HandleFunc("DELETE /features/delete", cfg.handlerFrontendDeleteFeature)
+	mux.HandleFunc("DELETE /features/{featureID}", cfg.handlerFrontendDeleteFeature)
 
 	// Game Features
 	mux.HandleFunc("GET /games/feature", cfg.handlerFrontendGetGameFeature)
-	mux.HandleFunc("GET /games/features/newform", cfg.handlerGameFeatureForm)
+	mux.HandleFunc("GET /games/features/newform", cfg.handlerAddGameFeatureForm)
 	mux.HandleFunc("GET /games/features/list", cfg.handlerFrontendGetGamesFeatures)
+	mux.HandleFunc("GET /features/games/list", cfg.handlerFrontendGetGamesByFeature)
 	mux.HandleFunc("POST /games/features/add", cfg.handlerFrontendAddGameFeature)
 	mux.HandleFunc("DELETE /games/features/delete", cfg.handlerFrontendDeleteGameFeature)
 

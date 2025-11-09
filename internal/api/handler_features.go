@@ -43,7 +43,20 @@ func (api *apiConfig) handlerGetFeature(w http.ResponseWriter, r *http.Request) 
 func (api *apiConfig) handlerGetFeatures(w http.ResponseWriter, r *http.Request) {
 	features, err := api.DB.GetFeatures(r.Context())
 	if err != nil {
-		data.RespondWithError(w, http.StatusInternalServerError, "Unable to receive features from database")
+		data.RespondWithError(w, http.StatusInternalServerError, "Unable to retrieve features from database")
+		return
+	}
+
+	data.RespondWithJSON(w, http.StatusOK, features)
+}
+
+func (api *apiConfig) handlerSearchFeatures(w http.ResponseWriter, r *http.Request) {
+	query := r.URL.Query().Get("q")
+
+	features, err := api.DB.GetFeaturesSearch(r.Context(), query)
+	if err != nil {
+		data.RespondWithError(w, http.StatusInternalServerError, "Unable to find matching features from database")
+		return
 	}
 
 	data.RespondWithJSON(w, http.StatusOK, features)

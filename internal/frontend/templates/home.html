@@ -5,35 +5,40 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Ableplay</title>
-    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="icon" type="image/png" href="/favicon.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
 </head>
 <body>
     <div class="container-fluid p-3">
         <h1 class="text-center">Welcome to Ableplay!</h1>
         <h3 class="text-center text-secondary">The Video Game Accessibility Feature Database</h3>
-        <nav class="nav nav-pills nav-fill">
-            <ul class="nav nav-underline">
-                <li class="nav-item">
-                    <button class="nav-link active" data-bs-toggle="pill" hx-get="/games" hx-target="#content" hx-swap="innerHTML">Games</button>
-                </li>
-                <li class="nav-item">
-                    <button class="nav-link" data-bs-toggle="pill" hx-get="/features" hx-target="#content" hx-swap="innerHTML">Features</button>
-                </li>
-                <li class="nav-item">
-                    <button class="nav-link " data-bs-toggle="pill" hx-get="/documentation" hx-target="#content" hx-swap="innerHTML">API</button>
-                </li>
-            </ul>
+        <nav class="navbar navbar-expand bg-body-tertiary">
             <div class="container-fluid">
-                <form class="d-flex" role="search" hx-ext="json-enc" hx-get="/games/features/find" hx-target="#content" hx-swap="innerHTML">
+                <ul class="navbar-nav nav-underline">
+                    <li class="nav-item">
+                        <button class="nav-link" data-bs-toggle="pill" hx-get="/games" hx-target="#content" hx-swap="innerHTML">Games</button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link" data-bs-toggle="pill" hx-get="/features" hx-target="#content" hx-swap="innerHTML">Features</button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link " data-bs-toggle="pill" hx-get="/documentation" hx-target="#content" hx-swap="innerHTML">API</button>
+                    </li>
+                </ul>
+                <form class="d-flex align-items-center" role="search" hx-get="/search" hx-target="#content" hx-swap="innerHTML" hx-on::after-request="clearSearchInput()">
                     <div class="input-group mb-3">
-                        <select class="form-select" style="max-width: 150px;">
+                        <select class="form-select" name="type" style="max-width: 150px;">
                             <option value="games" selected>Games</option>
                             <option value="features">Features</option>
                         </select>
-                        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-                        <button class="btn btn-outline-success" type="submit" disabled>Search</button>
+                        <input class="form-control me-2" name="query" id="searchInput" type="search" placeholder="Search" aria-label="Search" required>
+                        <button class="btn btn-outline-success" type="submit">Search</button>
                     </div>
+                    <script>
+                        function clearSearchInput() {
+                            document.getElementById("searchInput").value = "";
+                        }
+                    </script>
                 </form>
             </div>
         </nav>
@@ -41,13 +46,15 @@
         <div class="container-fluid p-3" id="content" hx-get="/games" hx-trigger="load" hx-swap="innerHTML">
         </div>
     </div>
-
 <script src="https://unpkg.com/htmx.org@1.9.12"></script>
 <script src="https://unpkg.com/htmx.org/dist/ext/json-enc.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
 <script>
-    const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]')
-    const popoverList = [...popoverTriggerList].map(popoverTriggerEl => new bootstrap.Popover(popoverTriggerEl))
+document.addEventListener("htmx:afterSwap", () => {
+  document.querySelectorAll('[data-bs-toggle="popover"]').forEach(el => {
+      new bootstrap.Popover(el);
+  });
+});
 </script>
 </body>
 </html>
