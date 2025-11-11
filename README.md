@@ -32,6 +32,10 @@ A live demo of Ableplay is available here:
 This demo showcases the core browsing experience and accessibility feature listings.  
 **Note:** Since this is a free-tier deployment, cold starts or slight loading delays may occur.
 
+The demo uses the API base of:
+
+**https://ableplay-api-latest.onrender.com**
+
 ---
 
 ## Local Development
