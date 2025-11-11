@@ -9,7 +9,6 @@ import (
 	"context"
 
 	"github.com/google/uuid"
-	"github.com/jackc/pgx/v5/pgtype"
 )
 
 const addGame = `-- name: AddGame :one
@@ -20,13 +19,13 @@ RETURNING id, created_at, updated_at, title, developer, publisher, release_year,
 `
 
 type AddGameParams struct {
-	Title       string      `json:"title"`
-	Developer   pgtype.Text `json:"developer"`
-	Publisher   pgtype.Text `json:"publisher"`
-	ReleaseYear pgtype.Int4 `json:"release_year"`
-	Platforms   []string    `json:"platforms"`
-	Description pgtype.Text `json:"description"`
-	Slug        pgtype.Text `json:"slug"`
+	Title       string   `json:"title"`
+	Developer   *string  `json:"developer"`
+	Publisher   *string  `json:"publisher"`
+	ReleaseYear *int32   `json:"release_year"`
+	Platforms   []string `json:"platforms"`
+	Description *string  `json:"description"`
+	Slug        *string  `json:"slug"`
 }
 
 func (q *Queries) AddGame(ctx context.Context, arg AddGameParams) (Game, error) {
@@ -71,13 +70,13 @@ WHERE id = $1
 `
 
 type GetGameRow struct {
-	ID          uuid.UUID   `json:"id"`
-	Title       string      `json:"title"`
-	Developer   pgtype.Text `json:"developer"`
-	Publisher   pgtype.Text `json:"publisher"`
-	ReleaseYear pgtype.Int4 `json:"release_year"`
-	Platforms   []string    `json:"platforms"`
-	Description pgtype.Text `json:"description"`
+	ID          uuid.UUID `json:"id"`
+	Title       string    `json:"title"`
+	Developer   *string   `json:"developer"`
+	Publisher   *string   `json:"publisher"`
+	ReleaseYear *int32    `json:"release_year"`
+	Platforms   []string  `json:"platforms"`
+	Description *string   `json:"description"`
 }
 
 func (q *Queries) GetGame(ctx context.Context, id uuid.UUID) (GetGameRow, error) {
@@ -99,20 +98,21 @@ const getGames = `-- name: GetGames :many
 SELECT id, title, developer, publisher, release_year, platforms, description
 FROM games
 ORDER BY title
+LIMIT $1
 `
 
 type GetGamesRow struct {
-	ID          uuid.UUID   `json:"id"`
-	Title       string      `json:"title"`
-	Developer   pgtype.Text `json:"developer"`
-	Publisher   pgtype.Text `json:"publisher"`
-	ReleaseYear pgtype.Int4 `json:"release_year"`
-	Platforms   []string    `json:"platforms"`
-	Description pgtype.Text `json:"description"`
+	ID          uuid.UUID `json:"id"`
+	Title       string    `json:"title"`
+	Developer   *string   `json:"developer"`
+	Publisher   *string   `json:"publisher"`
+	ReleaseYear *int32    `json:"release_year"`
+	Platforms   []string  `json:"platforms"`
+	Description *string   `json:"description"`
 }
 
-func (q *Queries) GetGames(ctx context.Context) ([]GetGamesRow, error) {
-	rows, err := q.db.Query(ctx, getGames)
+func (q *Queries) GetGames(ctx context.Context, limit int32) ([]GetGamesRow, error) {
+	rows, err := q.db.Query(ctx, getGames, limit)
 	if err != nil {
 		return nil, err
 	}
@@ -142,6 +142,7 @@ func (q *Queries) GetGames(ctx context.Context) ([]GetGamesRow, error) {
 const getGamesSearch = `-- name: GetGamesSearch :many
 SELECT 
     games.id,
+    games.slug,
     games.title,
     games.developer,
     games.publisher,
@@ -167,14 +168,15 @@ ORDER BY games.title
 `
 
 type GetGamesSearchRow struct {
-	ID           uuid.UUID   `json:"id"`
-	Title        string      `json:"title"`
-	Developer    pgtype.Text `json:"developer"`
-	Publisher    pgtype.Text `json:"publisher"`
-	ReleaseYear  pgtype.Int4 `json:"release_year"`
-	Platforms    []string    `json:"platforms"`
-	Description  pgtype.Text `json:"description"`
-	GameFeatures []byte      `json:"game_features"`
+	ID           uuid.UUID `json:"id"`
+	Slug         *string   `json:"slug"`
+	Title        string    `json:"title"`
+	Developer    *string   `json:"developer"`
+	Publisher    *string   `json:"publisher"`
+	ReleaseYear  *int32    `json:"release_year"`
+	Platforms    []string  `json:"platforms"`
+	Description  *string   `json:"description"`
+	GameFeatures []byte    `json:"game_features"`
 }
 
 func (q *Queries) GetGamesSearch(ctx context.Context, dollar_1 string) ([]GetGamesSearchRow, error) {
@@ -188,6 +190,7 @@ func (q *Queries) GetGamesSearch(ctx context.Context, dollar_1 string) ([]GetGam
 		var i GetGamesSearchRow
 		if err := rows.Scan(
 			&i.ID,
+			&i.Slug,
 			&i.Title,
 			&i.Developer,
 			&i.Publisher,
@@ -209,6 +212,7 @@ func (q *Queries) GetGamesSearch(ctx context.Context, dollar_1 string) ([]GetGam
 const getGamesWithFeatures = `-- name: GetGamesWithFeatures :many
 SELECT 
     games.id,
+    games.slug,
     games.title,
     games.developer,
     games.publisher,
@@ -223,21 +227,23 @@ SELECT
     ) AS game_features
 FROM games
 ORDER BY games.title
+LIMIT $1
 `
 
 type GetGamesWithFeaturesRow struct {
-	ID           uuid.UUID   `json:"id"`
-	Title        string      `json:"title"`
-	Developer    pgtype.Text `json:"developer"`
-	Publisher    pgtype.Text `json:"publisher"`
-	ReleaseYear  pgtype.Int4 `json:"release_year"`
-	Platforms    []string    `json:"platforms"`
-	Description  pgtype.Text `json:"description"`
-	GameFeatures []byte      `json:"game_features"`
+	ID           uuid.UUID `json:"id"`
+	Slug         *string   `json:"slug"`
+	Title        string    `json:"title"`
+	Developer    *string   `json:"developer"`
+	Publisher    *string   `json:"publisher"`
+	ReleaseYear  *int32    `json:"release_year"`
+	Platforms    []string  `json:"platforms"`
+	Description  *string   `json:"description"`
+	GameFeatures []byte    `json:"game_features"`
 }
 
-func (q *Queries) GetGamesWithFeatures(ctx context.Context) ([]GetGamesWithFeaturesRow, error) {
-	rows, err := q.db.Query(ctx, getGamesWithFeatures)
+func (q *Queries) GetGamesWithFeatures(ctx context.Context, limit int32) ([]GetGamesWithFeaturesRow, error) {
+	rows, err := q.db.Query(ctx, getGamesWithFeatures, limit)
 	if err != nil {
 		return nil, err
 	}
@@ -247,6 +253,7 @@ func (q *Queries) GetGamesWithFeatures(ctx context.Context) ([]GetGamesWithFeatu
 		var i GetGamesWithFeaturesRow
 		if err := rows.Scan(
 			&i.ID,
+			&i.Slug,
 			&i.Title,
 			&i.Developer,
 			&i.Publisher,
@@ -278,13 +285,13 @@ WHERE id = $1
 `
 
 type UpdateGameParams struct {
-	ID          uuid.UUID   `json:"id"`
-	Title       string      `json:"title"`
-	Developer   pgtype.Text `json:"developer"`
-	Publisher   pgtype.Text `json:"publisher"`
-	ReleaseYear pgtype.Int4 `json:"release_year"`
-	Platforms   []string    `json:"platforms"`
-	Description pgtype.Text `json:"description"`
+	ID          uuid.UUID `json:"id"`
+	Title       string    `json:"title"`
+	Developer   *string   `json:"developer"`
+	Publisher   *string   `json:"publisher"`
+	ReleaseYear *int32    `json:"release_year"`
+	Platforms   []string  `json:"platforms"`
+	Description *string   `json:"description"`
 }
 
 func (q *Queries) UpdateGame(ctx context.Context, arg UpdateGameParams) error {

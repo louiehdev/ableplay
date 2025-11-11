@@ -10,12 +10,13 @@ FROM features
 WHERE 
     name ILIKE CONCAT('%', $1::text, '%')
     OR category ILIKE CONCAT('%', $1::text, '%')
-ORDER BY category;
+ORDER BY category DESC;
 
 -- name: GetFeatures :many
 SELECT id, name, description, category 
 FROM features
-ORDER BY category;
+ORDER BY category DESC
+LIMIT $1;
 
 -- name: GetFeature :one
 SELECT id, name, description, category FROM features

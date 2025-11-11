@@ -46,13 +46,31 @@ func (api *apiConfig) handlerDeleteGameFeature(w http.ResponseWriter, r *http.Re
 }
 
 func (api *apiConfig) handlerGetGamesWithFeatures(w http.ResponseWriter, r *http.Request) {
-	games, err := api.DB.GetGamesWithFeatures(r.Context())
+	queryParams := r.URL.Query()
+	limit := data.ParseQueryParams(queryParams)
+
+	games, err := api.DB.GetGamesWithFeatures(r.Context(), limit)
 	if err != nil {
 		data.RespondWithError(w, http.StatusInternalServerError, fmt.Sprintf("Unable to receive games and features from database, %v", err))
 		return
 	}
+	var response []data.GameData
+	for _, game := range games {
+		var gameFeatures []data.GameFeatureData
+		json.Unmarshal(game.GameFeatures, &gameFeatures)
+		response = append(response, data.GameData{
+			ID:           game.ID,
+			Slug:         game.Slug,
+			Title:        game.Title,
+			Developer:    game.Developer,
+			Publisher:    game.Publisher,
+			ReleaseYear:  game.ReleaseYear,
+			Platforms:    game.Platforms,
+			Description:  game.Description,
+			GameFeatures: gameFeatures})
+	}
 
-	data.RespondWithJSON(w, http.StatusOK, games)
+	data.RespondWithJSON(w, http.StatusOK, response)
 }
 
 func (api *apiConfig) handlerGetGameFeature(w http.ResponseWriter, r *http.Request) {

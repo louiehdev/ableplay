@@ -7,6 +7,7 @@ RETURNING *;
 -- name: GetGamesWithFeatures :many
 SELECT 
     games.id,
+    games.slug,
     games.title,
     games.developer,
     games.publisher,
@@ -20,11 +21,13 @@ SELECT
         WHERE games_features.game_id = games.id
     ) AS game_features
 FROM games
-ORDER BY games.title;
+ORDER BY games.title
+LIMIT $1;
 
 -- name: GetGamesSearch :many
 SELECT 
     games.id,
+    games.slug,
     games.title,
     games.developer,
     games.publisher,
@@ -51,7 +54,8 @@ ORDER BY games.title;
 -- name: GetGames :many
 SELECT id, title, developer, publisher, release_year, platforms, description
 FROM games
-ORDER BY title;
+ORDER BY title
+LIMIT $1;
 
 -- name: GetGame :one
 SELECT id, title, developer, publisher, release_year, platforms, description FROM games

@@ -1,38 +1,115 @@
-{{define "apiDocs"}}
 <div class="container my-4">
     <h2 class="mb-3">AblePlay API Documentation</h2>
     <p class="text-muted">This page describes the backend API endpoints for games, features, and their relationships.</p>
     <hr/>
-    <div class="accordion" id="apiAccordion">
+    <div class="accordion" id="apiDocs">
         
         <div class="accordion-item">
-            <h2 class="accordion-header" id="gamesHeading">
+            <h2 class="accordion-header">
             <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#gamesSection">
                 Games Endpoints
             </button>
             </h2>
-            <div id="gamesSection" class="accordion-collapse collapse show" data-bs-parent="#apiAccordion">
+            <div id="gamesSection" class="accordion-collapse collapse show" data-bs-parent="#apiDocs">
             <div class="accordion-body">
                 <ul class="list-group">
                 <li class="list-group-item">
-                    <strong>GET /api/games</strong><br>
-                    Returns all games.
+                    <h4>GET /api/games/{gameID}</h4><br>
+                    Returns details for a single game.<br>
+                    <pre><code class="json">
+Example response:
+{
+   "id":"1234",
+   "title":"Super Mario Sunshine",
+   "developer":"Nintendo EAD",
+   "publisher":"Nintendo",
+   "release_year":2002,
+   "platforms":[
+      "Nintendo GameCube",
+      "Nintendo Switch"
+   ],
+   "description":"A 2002 platforming game where Mario is framed for a crime on the tropical vacation island of 
+    Isle Delfino. He must use his new companion, FLUDD (a water-squirting backpack), to clean up a mysterious 
+    goop that is covering the island while also pursuing the real culprit."
+}
+                    </code></pre>
                 </li>
                 <li class="list-group-item">
-                    <strong>GET /api/games/{gameID}</strong><br>
-                    Returns details for a single game.
+                    <h4>GET /api/games</h4><br>
+                    Returns all games.<br>
+                    <pre><code class="json">
+Example response:
+{
+    [
+        {
+            "id":"1234",
+            "title":"Super Mario Sunshine",
+            "developer":"Nintendo EAD",
+            "publisher":"Nintendo",
+            "release_year":2002,
+            "platforms":[
+                "Nintendo GameCube",
+                "Nintendo Switch"
+            ],
+            "description":"A 2002 platforming game where Mario is framed for a crime on the tropical vacation island of 
+                Isle Delfino. He must use his new companion, FLUDD (a water-squirting backpack), to clean up a mysterious 
+                goop that is covering the island while also pursuing the real culprit."
+        }
+        {
+            "..."
+        }
+    ]
+}
+                    </code></pre><br>
+                    <strong>Query Parameters</strong>
+                    <table class="table table-sm">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Field</th>
+                                <th>Type</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>limit</td>
+                                <td>Integer</td>
+                                <td>How many results to receive</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </li>
                 <li class="list-group-item">
-                    <strong>POST /api/games</strong><br>
-                    Creates a new game.<br>
-                    <code>{"title": "Example", ...}</code>
+                    <h4>GET /api/games/search</h4><br>
+                    Returns all games that wildcard match the provided query.<br>
+                    <strong>Query Parameters</strong>
+                    <table class="table table-sm">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Field</th>
+                                <th>Type</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>q</td>
+                                <td>String</td>
+                                <td>Your search query</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </li>
                 <li class="list-group-item">
-                    <strong>PUT /api/games/{gameID}</strong><br>
+                    <h4>POST /api/games</h4><br>
+                    Creates a new game.
+                </li>
+                <li class="list-group-item">
+                    <h4>PUT /api/games/{gameID}</h4><br>
                     Updates an existing game.
                 </li>
                 <li class="list-group-item">
-                    <strong>DELETE /api/games/{gameID}</strong><br>
+                    <h4>DELETE /api/games/{gameID}</h4><br>
                     Removes a game.
                 </li>
                 </ul>
@@ -41,32 +118,95 @@
         </div>
 
         <div class="accordion-item">
-            <h2 class="accordion-header" id="featuresHeading">
+            <h2 class="accordion-header">
             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#featuresSection">
                 Features Endpoints
             </button>
             </h2>
-            <div id="featuresSection" class="accordion-collapse collapse" data-bs-parent="#apiAccordion">
+            <div id="featuresSection" class="accordion-collapse collapse" data-bs-parent="#apiDocs">
             <div class="accordion-body">
                 <ul class="list-group">
                 <li class="list-group-item">
-                    <strong>GET /api/features</strong><br>
-                    Returns all features.
+                    <h4>GET /api/features/{featureID}</h4><br>
+                    Returns details for one feature.<br>
+                    <pre><code class="json">
+Example response:
+{
+    "id": "4321",
+    "name": "Subtitles",
+    "description": "Display text for dialogue and important sound effects",
+    "category": "Visual"
+}
+                    </code></pre>
                 </li>
                 <li class="list-group-item">
-                    <strong>GET /api/features/{featureID}</strong><br>
-                    Returns details for one feature.
+                    <h4>GET /api/features</h4><br>
+                    Returns all features.<br>
+                    <pre><code class="json">
+Example response:
+{
+    [
+        {
+            "id": "4321",
+            "name": "Subtitles",
+            "description": "Display text for dialogue and important sound effects",
+            "category": "Visual"
+        },
+        {
+            "..."
+        }
+    ]
+}
+                    </code></pre><br>
+                    <strong>Query Parameters</strong>
+                    <table class="table table-sm">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Field</th>
+                                <th>Type</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>limit</td>
+                                <td>Integer</td>
+                                <td>How many results to receive</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </li>
                 <li class="list-group-item">
-                    <strong>POST /api/features</strong><br>
+                    <h4>GET /api/features/search</h4><br>
+                    Returns all features that wildcard match the provided query.<br>
+                    <strong>Query Parameters</strong>
+                    <table class="table table-sm">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Field</th>
+                                <th>Type</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>q</td>
+                                <td>String</td>
+                                <td>Your search query</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </li>
+                <li class="list-group-item">
+                    <h4>POST /api/features</h4><br>
                     Creates a new feature.
                 </li>
                 <li class="list-group-item">
-                    <strong>PUT /api/features/{featureID}</strong><br>
+                    <h4>PUT /api/features/{featureID}</h4><br>
                     Updates a feature.
                 </li>
                 <li class="list-group-item">
-                    <strong>DELETE /api/features/{featureID}</strong><br>
+                    <h4>DELETE /api/features/{featureID}</h4><br>
                     Removes a feature.
                 </li>
                 </ul>
@@ -75,36 +215,146 @@
         </div>
 
         <div class="accordion-item">
-            <h2 class="accordion-header" id="gameFeatHeading">
-            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#gameFeatSection">
+            <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#gamesFeaturesSection">
                 Game-Feature Relationship Endpoints
             </button>
             </h2>
-            <div id="gameFeatSection" class="accordion-collapse collapse" data-bs-parent="#apiAccordion">
+            <div id="gamesFeaturesSection" class="accordion-collapse collapse" data-bs-parent="#apiDocs">
             <div class="accordion-body">
                 <ul class="list-group">
                 <li class="list-group-item">
-                    <strong>GET /api/games/features</strong><br>
-                    Returns all games with their features.
+                    <h4>GET /api/games/{gameID}/features/{featureID}</h4><br>
+                    Returns details for one game-feature relationship.<br>
+                    <pre><code class="json">
+Example response:
+{
+    "notes": "Game provides multiple colorblind modes for visual assistance",
+    "verified": true,
+    "title": "Baldur's Gate 3",
+    "name": "Colorblind Modes"
+}
+                    </code></pre>
                 </li>
                 <li class="list-group-item">
-                    <strong>GET /api/games/{gameID}/features</strong><br>
-                    Returns features for one game.
+                    <h4>GET /api/games/features</h4><br>
+                    Returns all games with their features.<br>
+                    <pre><code class="json">
+Example response:
+{
+   [
+      {
+         "id":"1234",
+         "title":"Super Mario Sunshine",
+         "developer":"Nintendo EAD",
+         "publisher":"Nintendo",
+         "release_year":2002,
+         "platforms":[
+            "Nintendo GameCube",
+            "Nintendo Switch"
+         ],
+         "description":"A 2002 platforming game where Mario is framed for a crime on the tropical vacation island of 
+          Isle Delfino. He must use his new companion, FLUDD (a water-squirting backpack), to clean up a mysterious 
+          goop that is covering the island while also pursuing the real culprit.",
+         "game_features":[
+            {
+                "id": "4321",
+                "name": "Colorblind Modes",
+                "notes": "Game provides multiple colorblind modes for visual assistance",
+                "verified": true
+            },
+            {
+                "..."
+            }
+         ]
+      },
+      {
+         "..."
+      }
+   ]
+}
+                    </code></pre><br>
+                    <strong>Query Parameters</strong>
+                    <table class="table table-sm">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Field</th>
+                                <th>Type</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>limit</td>
+                                <td>Integer</td>
+                                <td>How many results to receive</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </li>
                 <li class="list-group-item">
-                    <strong>GET /api/features/{featureID}/games</strong><br>
-                    Returns games with a specific feature.
+                    <h4>GET /api/games/{gameID}/features</h4><br>
+                    Returns features for one game.<br>
+                    <pre><code class="json">
+Example response:
+{
+   [
+      {
+         "notes":"Subtitles exist and work in this game",
+         "verified":true,
+         "feature_id":"4321",
+         "name":"Subtitles",
+         "description":"Display text for dialogue and important sound effects",
+         "category":"Visual"
+      },
+      {
+         "..."
+      }
+   ]
+}
+                    </code></pre>
                 </li>
                 <li class="list-group-item">
-                    <strong>POST /api/games/{gameID}/features</strong><br>
+                    <h4>GET /api/features/{featureID}/games</h4><br>
+                    Returns games with a specific feature.<br>
+                    <pre><code class="json">
+Example response:
+{
+   [
+      {
+         "notes":"Subtitles exist and work in this game",
+         "verified":true,
+         "feature_id":"4321",
+         "game_id":"1234",
+         "title":"Super Mario Sunshine",
+         "developer":"Nintendo EAD",
+         "publisher":"Nintendo",
+         "release_year":2002,
+         "platforms":[
+            "Nintendo GameCube",
+            "Nintendo Switch"
+         ],
+         "description":"A 2002 platforming game where Mario is framed for a crime on the tropical vacation island of 
+          Isle Delfino. He must use his new companion, FLUDD (a water-squirting backpack), to clean up a mysterious 
+          goop that is covering the island while also pursuing the real culprit.",
+      },
+      {
+         "..."
+      }
+   ]
+}
+                    </code></pre>
+                </li>
+                <li class="list-group-item">
+                    <h4>POST /api/games/{gameID}/features</h4><br>
                     Associates a feature to a game.
                 </li>
                 <li class="list-group-item">
-                    <strong>PUT /api/games/{gameID}/features/{featureID}</strong><br>
+                    <h4>PUT /api/games/{gameID}/features/{featureID}</h4><br>
                     Updates relationship notes / verification.
                 </li>
                 <li class="list-group-item">
-                    <strong>DELETE /api/games/{gameID}/features/{featureID}</strong><br>
+                    <h4>DELETE /api/games/{gameID}/features/{featureID}</h4><br>
                     Removes a feature from a game.
                 </li>
                 </ul>
@@ -113,4 +363,3 @@
         </div>
 
 </div>
-{{end}}

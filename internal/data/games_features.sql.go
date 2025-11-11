@@ -9,7 +9,6 @@ import (
 	"context"
 
 	"github.com/google/uuid"
-	"github.com/jackc/pgx/v5/pgtype"
 )
 
 const createGameFeature = `-- name: CreateGameFeature :one
@@ -19,10 +18,10 @@ RETURNING id, created_at, updated_at, game_id, feature_id, notes, verified
 `
 
 type CreateGameFeatureParams struct {
-	GameID    uuid.UUID   `json:"game_id"`
-	FeatureID uuid.UUID   `json:"feature_id"`
-	Notes     pgtype.Text `json:"notes"`
-	Verified  bool        `json:"verified"`
+	GameID    uuid.UUID `json:"game_id"`
+	FeatureID uuid.UUID `json:"feature_id"`
+	Notes     *string   `json:"notes"`
+	Verified  bool      `json:"verified"`
 }
 
 func (q *Queries) CreateGameFeature(ctx context.Context, arg CreateGameFeatureParams) (GamesFeature, error) {
@@ -62,21 +61,20 @@ func (q *Queries) DeleteGameFeature(ctx context.Context, arg DeleteGameFeaturePa
 
 const getFeaturesByGame = `-- name: GetFeaturesByGame :many
 SELECT 
-    games_features.id, games_features.notes, games_features.verified,
+    games_features.notes, games_features.verified,
     features.id AS feature_id, features.name, features.description, features.category
 FROM games_features
-INNER JOIN features ON games_features.feature_id = features.id
+JOIN features ON games_features.feature_id = features.id
 WHERE games_features.game_id = $1
 `
 
 type GetFeaturesByGameRow struct {
-	ID          uuid.UUID   `json:"id"`
-	Notes       pgtype.Text `json:"notes"`
-	Verified    bool        `json:"verified"`
-	FeatureID   uuid.UUID   `json:"feature_id"`
-	Name        string      `json:"name"`
-	Description pgtype.Text `json:"description"`
-	Category    string      `json:"category"`
+	Notes       *string   `json:"notes"`
+	Verified    bool      `json:"verified"`
+	FeatureID   uuid.UUID `json:"feature_id"`
+	Name        string    `json:"name"`
+	Description *string   `json:"description"`
+	Category    string    `json:"category"`
 }
 
 func (q *Queries) GetFeaturesByGame(ctx context.Context, gameID uuid.UUID) ([]GetFeaturesByGameRow, error) {
@@ -89,7 +87,6 @@ func (q *Queries) GetFeaturesByGame(ctx context.Context, gameID uuid.UUID) ([]Ge
 	for rows.Next() {
 		var i GetFeaturesByGameRow
 		if err := rows.Scan(
-			&i.ID,
 			&i.Notes,
 			&i.Verified,
 			&i.FeatureID,
@@ -124,10 +121,10 @@ type GetGameFeatureParams struct {
 }
 
 type GetGameFeatureRow struct {
-	Notes    pgtype.Text `json:"notes"`
-	Verified bool        `json:"verified"`
-	Title    string      `json:"title"`
-	Name     string      `json:"name"`
+	Notes    *string `json:"notes"`
+	Verified bool    `json:"verified"`
+	Title    string  `json:"title"`
+	Name     string  `json:"name"`
 }
 
 func (q *Queries) GetGameFeature(ctx context.Context, arg GetGameFeatureParams) (GetGameFeatureRow, error) {
@@ -144,23 +141,24 @@ func (q *Queries) GetGameFeature(ctx context.Context, arg GetGameFeatureParams) 
 
 const getGamesByFeature = `-- name: GetGamesByFeature :many
 SELECT 
-    games_features.notes, games_features.verified,
+    games_features.notes, games_features.verified, games_features.feature_id,
     games.id AS game_id, games.title, games.developer, games.publisher, games.release_year, games.platforms, games.description
 FROM games_features
-INNER JOIN games ON games_features.game_id = games.id
+JOIN games ON games_features.game_id = games.id
 WHERE games_features.feature_id = $1
 `
 
 type GetGamesByFeatureRow struct {
-	Notes       pgtype.Text `json:"notes"`
-	Verified    bool        `json:"verified"`
-	GameID      uuid.UUID   `json:"game_id"`
-	Title       string      `json:"title"`
-	Developer   pgtype.Text `json:"developer"`
-	Publisher   pgtype.Text `json:"publisher"`
-	ReleaseYear pgtype.Int4 `json:"release_year"`
-	Platforms   []string    `json:"platforms"`
-	Description pgtype.Text `json:"description"`
+	Notes       *string   `json:"notes"`
+	Verified    bool      `json:"verified"`
+	FeatureID   uuid.UUID `json:"feature_id"`
+	GameID      uuid.UUID `json:"game_id"`
+	Title       string    `json:"title"`
+	Developer   *string   `json:"developer"`
+	Publisher   *string   `json:"publisher"`
+	ReleaseYear *int32    `json:"release_year"`
+	Platforms   []string  `json:"platforms"`
+	Description *string   `json:"description"`
 }
 
 func (q *Queries) GetGamesByFeature(ctx context.Context, featureID uuid.UUID) ([]GetGamesByFeatureRow, error) {
@@ -175,6 +173,7 @@ func (q *Queries) GetGamesByFeature(ctx context.Context, featureID uuid.UUID) ([
 		if err := rows.Scan(
 			&i.Notes,
 			&i.Verified,
+			&i.FeatureID,
 			&i.GameID,
 			&i.Title,
 			&i.Developer,
@@ -204,12 +203,12 @@ WHERE game_id = $1 AND feature_id = $2
 `
 
 type UpdateGameFeatureParams struct {
-	GameID      uuid.UUID   `json:"game_id"`
-	FeatureID   uuid.UUID   `json:"feature_id"`
-	GameID_2    uuid.UUID   `json:"game_id_2"`
-	FeatureID_2 uuid.UUID   `json:"feature_id_2"`
-	Notes       pgtype.Text `json:"notes"`
-	Verified    bool        `json:"verified"`
+	GameID      uuid.UUID `json:"game_id"`
+	FeatureID   uuid.UUID `json:"feature_id"`
+	GameID_2    uuid.UUID `json:"game_id_2"`
+	FeatureID_2 uuid.UUID `json:"feature_id_2"`
+	Notes       *string   `json:"notes"`
+	Verified    bool      `json:"verified"`
 }
 
 func (q *Queries) UpdateGameFeature(ctx context.Context, arg UpdateGameFeatureParams) error {

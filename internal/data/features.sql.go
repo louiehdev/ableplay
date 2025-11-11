@@ -9,7 +9,6 @@ import (
 	"context"
 
 	"github.com/google/uuid"
-	"github.com/jackc/pgx/v5/pgtype"
 )
 
 const addFeature = `-- name: AddFeature :one
@@ -20,9 +19,9 @@ RETURNING id, created_at, updated_at, name, description, category, slug
 `
 
 type AddFeatureParams struct {
-	Name        string      `json:"name"`
-	Description pgtype.Text `json:"description"`
-	Category    string      `json:"category"`
+	Name        string  `json:"name"`
+	Description *string `json:"description"`
+	Category    string  `json:"category"`
 }
 
 func (q *Queries) AddFeature(ctx context.Context, arg AddFeatureParams) (Feature, error) {
@@ -56,10 +55,10 @@ WHERE id = $1
 `
 
 type GetFeatureRow struct {
-	ID          uuid.UUID   `json:"id"`
-	Name        string      `json:"name"`
-	Description pgtype.Text `json:"description"`
-	Category    string      `json:"category"`
+	ID          uuid.UUID `json:"id"`
+	Name        string    `json:"name"`
+	Description *string   `json:"description"`
+	Category    string    `json:"category"`
 }
 
 func (q *Queries) GetFeature(ctx context.Context, id uuid.UUID) (GetFeatureRow, error) {
@@ -77,18 +76,19 @@ func (q *Queries) GetFeature(ctx context.Context, id uuid.UUID) (GetFeatureRow, 
 const getFeatures = `-- name: GetFeatures :many
 SELECT id, name, description, category 
 FROM features
-ORDER BY category
+ORDER BY category DESC
+LIMIT $1
 `
 
 type GetFeaturesRow struct {
-	ID          uuid.UUID   `json:"id"`
-	Name        string      `json:"name"`
-	Description pgtype.Text `json:"description"`
-	Category    string      `json:"category"`
+	ID          uuid.UUID `json:"id"`
+	Name        string    `json:"name"`
+	Description *string   `json:"description"`
+	Category    string    `json:"category"`
 }
 
-func (q *Queries) GetFeatures(ctx context.Context) ([]GetFeaturesRow, error) {
-	rows, err := q.db.Query(ctx, getFeatures)
+func (q *Queries) GetFeatures(ctx context.Context, limit int32) ([]GetFeaturesRow, error) {
+	rows, err := q.db.Query(ctx, getFeatures, limit)
 	if err != nil {
 		return nil, err
 	}
@@ -118,14 +118,14 @@ FROM features
 WHERE 
     name ILIKE CONCAT('%', $1::text, '%')
     OR category ILIKE CONCAT('%', $1::text, '%')
-ORDER BY category
+ORDER BY category DESC
 `
 
 type GetFeaturesSearchRow struct {
-	ID          uuid.UUID   `json:"id"`
-	Name        string      `json:"name"`
-	Description pgtype.Text `json:"description"`
-	Category    string      `json:"category"`
+	ID          uuid.UUID `json:"id"`
+	Name        string    `json:"name"`
+	Description *string   `json:"description"`
+	Category    string    `json:"category"`
 }
 
 func (q *Queries) GetFeaturesSearch(ctx context.Context, dollar_1 string) ([]GetFeaturesSearchRow, error) {
@@ -163,10 +163,10 @@ WHERE id = $1
 `
 
 type UpdateFeatureParams struct {
-	ID          uuid.UUID   `json:"id"`
-	Name        string      `json:"name"`
-	Description pgtype.Text `json:"description"`
-	Category    string      `json:"category"`
+	ID          uuid.UUID `json:"id"`
+	Name        string    `json:"name"`
+	Description *string   `json:"description"`
+	Category    string    `json:"category"`
 }
 
 func (q *Queries) UpdateFeature(ctx context.Context, arg UpdateFeatureParams) error {

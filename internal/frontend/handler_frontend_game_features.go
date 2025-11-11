@@ -3,7 +3,6 @@ package frontend
 import (
 	"encoding/json"
 	"net/http"
-	"strconv"
 
 	"github.com/google/uuid"
 	"github.com/louiehdev/ableplay/internal/data"
@@ -24,18 +23,8 @@ func (f *frontendConfig) handlerFrontendGetGameFeature(w http.ResponseWriter, r 
 	}
 	defer resp.Body.Close()
 
-	var gamefeatureData data.GetGameFeatureRow
-	json.NewDecoder(resp.Body).Decode(&gamefeatureData)
-	gameFeature := struct {
-		Notes    string `json:"notes"`
-		Verified bool   `json:"verified"`
-		Title    string `json:"title"`
-		Name     string `json:"name"`
-	}{
-		Notes:    gamefeatureData.Notes.String,
-		Verified: gamefeatureData.Verified,
-		Title:    gamefeatureData.Title,
-		Name:     gamefeatureData.Name}
+	var gameFeature data.GameFeaturePublic
+	json.NewDecoder(resp.Body).Decode(&gameFeature)
 
 	f.templates.ExecuteTemplate(w, "gamefeatureCard", gameFeature)
 }
@@ -48,23 +37,10 @@ func (f *frontendConfig) handlerFrontendGetGamesFeatures(w http.ResponseWriter, 
 	}
 	defer resp.Body.Close()
 
-	var gamesData []data.GetGamesWithFeaturesRow
-	json.NewDecoder(resp.Body).Decode(&gamesData)
-	var gamesList []data.GamePublic
-	for _, game := range gamesData {
-		var gameFeatures []data.GameFeatureData
-		json.Unmarshal(game.GameFeatures, &gameFeatures)
-		gamesList = append(gamesList, data.GamePublic{
-			ID:           game.ID.String(),
-			Title:        game.Title,
-			Developer:    game.Developer.String,
-			Publisher:    game.Publisher.String,
-			ReleaseYear:  strconv.Itoa(int(game.ReleaseYear.Int32)),
-			Platforms:    game.Platforms,
-			Description:  game.Description.String,
-			GameFeatures: gameFeatures})
-	}
-	f.templates.ExecuteTemplate(w, "gamesList", gamesList)
+	var games []data.GamePublic
+	json.NewDecoder(resp.Body).Decode(&games)
+
+	f.templates.ExecuteTemplate(w, "gamesList", games)
 }
 
 func (f *frontendConfig) handlerFrontendGetGamesByFeature(w http.ResponseWriter, r *http.Request) {
@@ -77,24 +53,10 @@ func (f *frontendConfig) handlerFrontendGetGamesByFeature(w http.ResponseWriter,
 	}
 	defer resp.Body.Close()
 
-	var gamesData []data.GetGamesByFeatureRow
-	json.NewDecoder(resp.Body).Decode(&gamesData)
-	var gamesList []data.GameByFeaturePublic
-	for _, game := range gamesData {
-		gamesList = append(gamesList, data.GameByFeaturePublic{
-			FeatureID:   featureID,
-			GameID:      game.GameID.String(),
-			Notes:       game.Notes.String,
-			Verified:    game.Verified,
-			Title:       game.Title,
-			Developer:   game.Developer.String,
-			Publisher:   game.Publisher.String,
-			ReleaseYear: strconv.Itoa(int(game.ReleaseYear.Int32)),
-			Platforms:   game.Platforms,
-			Description: game.Description.String})
-	}
+	var games []data.GameByFeaturePublic
+	json.NewDecoder(resp.Body).Decode(&games)
 
-	if err := f.templates.ExecuteTemplate(w, "gamesbyfeatureList", gamesList); err != nil {
+	if err := f.templates.ExecuteTemplate(w, "gamesbyfeatureList", games); err != nil {
 		data.RespondWithError(w, http.StatusInternalServerError, err.Error())
 	}
 }
@@ -110,20 +72,14 @@ func (f *frontendConfig) handlerAddGameFeatureForm(w http.ResponseWriter, r *htt
 	}
 	defer resp.Body.Close()
 
-	var features []data.FeatureData
+	var features []data.FeaturePublic
 	json.NewDecoder(resp.Body).Decode(&features)
-	var featureList []data.FeaturePublic
-	for _, feature := range features {
-		featureList = append(featureList, data.FeaturePublic{
-			ID:   feature.ID.String(),
-			Name: feature.Name})
-	}
 
 	formData := struct {
 		GameID      string
 		GameTitle   string
 		FeatureList []data.FeaturePublic
-	}{GameID: gameID, GameTitle: gameTitle, FeatureList: featureList}
+	}{GameID: gameID, GameTitle: gameTitle, FeatureList: features}
 
 	f.templates.ExecuteTemplate(w, "addGameFeatureForm", formData)
 }
@@ -141,7 +97,7 @@ func (f *frontendConfig) handlerFrontendAddGameFeature(w http.ResponseWriter, r 
 	gamefeatureParams := data.CreateGameFeatureParams{
 		GameID:    gameUUID,
 		FeatureID: featureUUID,
-		Notes:     data.ToPgtypeText(params.Notes),
+		Notes:     params.Notes,
 		Verified:  data.IsChecked(params.Verified),
 	}
 
@@ -156,15 +112,15 @@ func (f *frontendConfig) handlerFrontendAddGameFeature(w http.ResponseWriter, r 
 }
 
 func (f *frontendConfig) handlerFrontendDeleteGameFeature(w http.ResponseWriter, r *http.Request) {
-	gameID := r.URL.Query().Get("game_id")
-	featureID := r.URL.Query().Get("feature_id")
+	gameID := r.PathValue("gameID")
+	featureID := r.PathValue("featureID")
 
-	_, err := f.callAPI(r.Context(), r.Method, "/api/games/"+gameID+"/features/"+featureID, nil)
+	_, err := f.callAPI(r.Context(), "DELETE", "/api/games/"+gameID+"/features/"+featureID, nil)
 	if err != nil {
-		data.RespondWithError(w, http.StatusInternalServerError, "Failed to fetch game feature")
+		data.RespondWithError(w, http.StatusInternalServerError, "Failed to delete game feature")
 		return
 	}
 
 	w.Header().Set("HX-Trigger", "gamefeatureDeleted")
-	w.WriteHeader(http.StatusNoContent)
+	w.WriteHeader(http.StatusOK)
 }

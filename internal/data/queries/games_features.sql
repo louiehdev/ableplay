@@ -15,18 +15,18 @@ WHERE games_features.game_id = $1 AND games_features.feature_id = $2;
 
 -- name: GetFeaturesByGame :many
 SELECT 
-    games_features.id, games_features.notes, games_features.verified,
+    games_features.notes, games_features.verified,
     features.id AS feature_id, features.name, features.description, features.category
 FROM games_features
-INNER JOIN features ON games_features.feature_id = features.id
+JOIN features ON games_features.feature_id = features.id
 WHERE games_features.game_id = $1;
 
 -- name: GetGamesByFeature :many
 SELECT 
-    games_features.notes, games_features.verified,
+    games_features.notes, games_features.verified, games_features.feature_id,
     games.id AS game_id, games.title, games.developer, games.publisher, games.release_year, games.platforms, games.description
 FROM games_features
-INNER JOIN games ON games_features.game_id = games.id
+JOIN games ON games_features.game_id = games.id
 WHERE games_features.feature_id = $1;
 
 -- name: UpdateGameFeature :exec

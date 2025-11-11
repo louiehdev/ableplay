@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"net/url"
 	"strconv"
 
 	"github.com/google/uuid"
-	"github.com/jackc/pgx/v5/pgtype"
 )
 
 func RespondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
@@ -52,20 +52,40 @@ func GetRequestUUID(r *http.Request, idType string) (uuid.UUID, error) {
 	return reqUUID, nil
 }
 
-func ToPgtypeText(s string) pgtype.Text {
-	if s == "" {
-		return pgtype.Text{Valid: false}
+func ParseQueryParams(values url.Values) (limit int32) {
+	// TO-DO: Allow for greater amount of params and return correct value types
+
+	// Example: queries := make(map[string]interface{}, len(values))
+
+	limit = 50
+
+	if limitStr := values.Get("limit"); limitStr != "" {
+		if l, err := strconv.Atoi(limitStr); err == nil && l > 0 {
+			limit = int32(l)
+		}
 	}
-	return pgtype.Text{String: s, Valid: true}
+
+	if limit > 100 {
+		limit = 100
+	}
+
+	return limit
 }
 
-func ToPgtypeInt4(stringInt string) pgtype.Int4 {
+func ToNullableText(s string) *string {
+	if s == "" {
+		return nil
+	}
+	return &s
+}
+
+func ToNullableInt(stringInt string) *int32 {
 	i, err := strconv.Atoi(stringInt)
 	if err != nil {
-		return pgtype.Int4{Valid: false}
+		return nil
 	}
-
-	return pgtype.Int4{Int32: int32(i), Valid: true}
+	nInt := int32(i)
+	return &nInt
 }
 
 func RemoveEmptyValues(stringSlice []string) []string {

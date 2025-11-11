@@ -41,7 +41,10 @@ func (api *apiConfig) handlerGetGame(w http.ResponseWriter, r *http.Request) {
 }
 
 func (api *apiConfig) handlerGetGames(w http.ResponseWriter, r *http.Request) {
-	games, err := api.DB.GetGames(r.Context())
+	queryParams := r.URL.Query()
+	limit := data.ParseQueryParams(queryParams)
+
+	games, err := api.DB.GetGames(r.Context(), limit)
 	if err != nil {
 		data.RespondWithError(w, http.StatusInternalServerError, "Unable to retrieve games from database")
 		return
@@ -59,7 +62,22 @@ func (api *apiConfig) handlerSearchGames(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	data.RespondWithJSON(w, http.StatusOK, games)
+	var response []data.GameData
+	for _, game := range games {
+		var gameFeatures []data.GameFeatureData
+		json.Unmarshal(game.GameFeatures, &gameFeatures)
+		response = append(response, data.GameData{
+			ID:           game.ID,
+			Title:        game.Title,
+			Developer:    game.Developer,
+			Publisher:    game.Publisher,
+			ReleaseYear:  game.ReleaseYear,
+			Platforms:    game.Platforms,
+			Description:  game.Description,
+			GameFeatures: gameFeatures})
+	}
+
+	data.RespondWithJSON(w, http.StatusOK, response)
 }
 
 func (api *apiConfig) handlerUpdateGame(w http.ResponseWriter, r *http.Request) {

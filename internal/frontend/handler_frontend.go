@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
-	"strconv"
 
 	"github.com/louiehdev/ableplay/internal/data"
 )
@@ -16,7 +15,7 @@ func (f *frontendConfig) handlerHome(w http.ResponseWriter, r *http.Request) {
 }
 
 func (f *frontendConfig) handlerDocumentation(w http.ResponseWriter, _ *http.Request) {
-	f.templates.ExecuteTemplate(w, "apiDocs", nil)
+	f.templates.ExecuteTemplate(w, "api_documentation.html", nil)
 }
 
 func (f *frontendConfig) handlerSearch(w http.ResponseWriter, r *http.Request) {
@@ -32,23 +31,10 @@ func (f *frontendConfig) handlerSearch(w http.ResponseWriter, r *http.Request) {
 		}
 		defer resp.Body.Close()
 
-		var gamesData []data.GetGamesSearchRow
-		json.NewDecoder(resp.Body).Decode(&gamesData)
-		var gamesList []data.GamePublic
-		for _, game := range gamesData {
-			var gameFeatures []data.GameFeatureData
-			json.Unmarshal(game.GameFeatures, &gameFeatures)
-			gamesList = append(gamesList, data.GamePublic{
-				ID:           game.ID.String(),
-				Title:        game.Title,
-				Developer:    game.Developer.String,
-				Publisher:    game.Publisher.String,
-				ReleaseYear:  strconv.Itoa(int(game.ReleaseYear.Int32)),
-				Platforms:    game.Platforms,
-				Description:  game.Description.String,
-				GameFeatures: gameFeatures})
-		}
-		f.templates.ExecuteTemplate(w, "gamesList", gamesList)
+		var games []data.GamePublic
+		json.NewDecoder(resp.Body).Decode(&games)
+
+		f.templates.ExecuteTemplate(w, "gamesList", games)
 	case "features":
 		resp, err := f.callAPI(r.Context(), r.Method, "/api/features/search?q="+query, nil)
 		if err != nil {
@@ -64,8 +50,8 @@ func (f *frontendConfig) handlerSearch(w http.ResponseWriter, r *http.Request) {
 			featureList = append(featureList, data.FeaturePublic{
 				ID:          feature.ID.String(),
 				Name:        feature.Name,
-				Description: feature.Description.String,
-				Category:    feature.Category.String})
+				Description: feature.Description,
+				Category:    feature.Category})
 		}
 
 		f.templates.ExecuteTemplate(w, "featuresList", featureList)

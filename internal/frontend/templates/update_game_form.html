@@ -1,6 +1,6 @@
 {{define "updateGameForm"}}
 {{if .}}
-<form hx-ext="json-enc" hx-put="/games/update">
+<form hx-ext="json-enc" hx-put="/games/update" hx-swap="delete">
     <header>
         <h2>Update Game</h2>
         <p>Please fill out the form below to update the game in the database.</p>
@@ -8,29 +8,29 @@
     <div>
         <input type="hidden" id="id" name="id" value="{{.ID}}">
         <label for="title">Game Title:</label><br>
-        <input type="text" id="title" name="title" value="{{.Title}}"><br>
+        <input class="form-control mb-1" type="text" id="title" name="title" value="{{.Title}}"><br>
         <label for="developer">Developer:</label><br>
-        <input type="text" id="developer" name="developer" value="{{.Developer}}"><br>
+        <input class="form-control" type="text" id="developer" name="developer" value="{{.Developer}}"><br>
         <label for="publisher">Publisher:</label><br>
-        <input type="text" id="publisher" name="publisher" value="{{.Publisher}}"><br>
+        <input class="form-control" type="text" id="publisher" name="publisher" value="{{.Publisher}}"><br>
         <label for="releaseyear">Release Year:</label><br>
-        <input type="number" id="releaseyear" name="release_year" value="{{.ReleaseYear}}"><br>
+        <input class="form-control" type="number" id="releaseyear" name="release_year" value="{{.ReleaseYear}}"><br>
         
         <div id="platforms">   
             <label for="platforms">Platforms:</label><br>
             <input type="hidden" name="platforms" value="">
             {{range $i, $p := .Platforms}}
-                <input type="text" name="platforms" value="{{$p}}"><br>
+                <input class="form-control" type="text" name="platforms" value="{{$p}}"><br>
             {{end}}
             
         </div>
         <div>
-        <button type="button" class="btn btn-outline-secondary btn-sm" hx-get="/games/addformfeature" hx-target="#platforms" hx-swap="beforeend">
+        <button type="button" class="btn btn-outline-secondary btn-sm" hx-get="/games/addformplatform" hx-target="#platforms" hx-swap="beforeend">
             + Add Platform
         </button>
         </div>
         <label for="description">Description:</label><br>
-        <input type="text" id="description" name="description" value="{{.Description}}"><br>
+        <textarea class="form-control text-wrap" id="description" name="description" rows="3">{{.Description}}</textarea><br>
     </div>
     <div class="mt-2">
     <button type="submit" class="btn btn-outline-primary">

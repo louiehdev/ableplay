@@ -20,18 +20,10 @@ func (f *frontendConfig) handlerFrontendGetFeatures(w http.ResponseWriter, r *ht
 	}
 	defer resp.Body.Close()
 
-	var features []data.FeatureData
+	var features []data.FeaturePublic
 	json.NewDecoder(resp.Body).Decode(&features)
-	var featureList []data.FeaturePublic
-	for _, feature := range features {
-		featureList = append(featureList, data.FeaturePublic{
-			ID:          feature.ID.String(),
-			Name:        feature.Name,
-			Description: feature.Description.String,
-			Category:    feature.Category.String})
-	}
 
-	f.templates.ExecuteTemplate(w, "featuresList", featureList)
+	f.templates.ExecuteTemplate(w, "featuresList", features)
 }
 
 func (f *frontendConfig) handlerAddFeatureForm(w http.ResponseWriter, _ *http.Request) {
@@ -57,14 +49,14 @@ func (f *frontendConfig) handlerUpdateFeatureForm(w http.ResponseWriter, r *http
 	feature := data.FeaturePublic{
 		ID:          featureData.ID.String(),
 		Name:        featureData.Name,
-		Description: featureData.Description.String,
+		Description: featureData.Description,
 		Category:    featureData.Category}
 
 	f.templates.ExecuteTemplate(w, "updateFeatureForm", feature)
 }
 
 func (f *frontendConfig) handlerFrontendAddFeature(w http.ResponseWriter, r *http.Request) {
-	var params data.FeaturePublic
+	var params data.FeatureForm
 	decoder := json.NewDecoder(r.Body)
 	if err := decoder.Decode(&params); err != nil {
 		data.RespondWithError(w, http.StatusInternalServerError, "Something went wrong")
@@ -73,7 +65,7 @@ func (f *frontendConfig) handlerFrontendAddFeature(w http.ResponseWriter, r *htt
 
 	addFeatureParams := data.AddFeatureParams{
 		Name:        params.Name,
-		Description: data.ToPgtypeText(params.Description),
+		Description: data.ToNullableText(params.Description),
 		Category:    params.Category}
 
 	_, resperror := f.callAPI(r.Context(), r.Method, "/api/features", addFeatureParams)
@@ -87,7 +79,7 @@ func (f *frontendConfig) handlerFrontendAddFeature(w http.ResponseWriter, r *htt
 }
 
 func (f *frontendConfig) handlerFrontendUpdateFeature(w http.ResponseWriter, r *http.Request) {
-	var params data.FeaturePublic
+	var params data.FeatureForm
 	decoder := json.NewDecoder(r.Body)
 	if err := decoder.Decode(&params); err != nil {
 		data.RespondWithError(w, http.StatusInternalServerError, "Something went wrong")
@@ -98,8 +90,8 @@ func (f *frontendConfig) handlerFrontendUpdateFeature(w http.ResponseWriter, r *
 	updateFeatureParams := data.FeatureData{
 		ID:          featureUUID,
 		Name:        params.Name,
-		Description: data.ToPgtypeText(params.Description),
-		Category:    data.ToPgtypeText(params.Category),
+		Description: data.ToNullableText(params.Description),
+		Category:    params.Category,
 	}
 
 	_, resperror := f.callAPI(r.Context(), r.Method, "/api/features/"+params.ID, updateFeatureParams)
@@ -109,7 +101,7 @@ func (f *frontendConfig) handlerFrontendUpdateFeature(w http.ResponseWriter, r *
 	}
 
 	w.Header().Set("HX-Trigger", "featureUpdated")
-	w.WriteHeader(http.StatusNoContent)
+	w.WriteHeader(http.StatusOK)
 }
 
 func (f *frontendConfig) handlerFrontendDeleteFeature(w http.ResponseWriter, r *http.Request) {
@@ -122,5 +114,5 @@ func (f *frontendConfig) handlerFrontendDeleteFeature(w http.ResponseWriter, r *
 	}
 
 	w.Header().Set("HX-Trigger", "featureDeleted")
-	w.WriteHeader(http.StatusNoContent)
+	w.WriteHeader(http.StatusOK)
 }

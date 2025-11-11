@@ -1,5 +1,5 @@
 {{define "updateFeatureForm"}}
-<form hx-ext="json-enc" hx-put="/features/update">
+<form hx-ext="json-enc" hx-put="/features/update" hx-swap="delete">
     <header>
         <h2>Update Feature</h2>
         <p>Please fill out the form below to update the feature in the database.</p>
@@ -8,10 +8,10 @@
         <input type="hidden" id="id" name="id" value="{{.ID}}">
         
         <label for="name">Feature Name:</label><br>
-        <input type="text" id="name" name="name" value="{{.Name}}"><br>
+        <input class="form-control" type="text" id="name" name="name" value="{{.Name}}"><br>
         
         <label for="description">Description:</label><br>
-        <input type="text" id="description" name="description" value="{{.Description}}"><br>
+        <textarea class="form-control text-wrap" id="description" name="description" rows="3">{{.Description}}</textarea><br>
         
         <label for="category">Category:</label>
         <select class="form-select" id="category" name="category">

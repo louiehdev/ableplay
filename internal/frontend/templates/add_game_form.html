@@ -1,5 +1,5 @@
 {{define "addGameForm"}}
-<form hx-ext="json-enc" hx-post="/games/add">
+<form hx-ext="json-enc" hx-post="/games/add" hx-swap="delete">
     <header>
         <h2>Add New Game</h2>
         <p>Please fill out the form below to add the game to the database.</p>
@@ -22,7 +22,7 @@
             + Add Platform
         </button>
         <label for="description">Description:</label><br>
-        <input class="form-control" type="text" id="description" name="description"><br>
+        <textarea class="form-control text-wrap" id="description" name="description" rows="3"></textarea><br>
     </div>
     <div class="mt-1">
     <button type="submit" class="btn btn-outline-primary">

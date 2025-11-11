@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"strconv"
 
 	"github.com/google/uuid"
 	"github.com/louiehdev/ableplay/internal/data"
@@ -19,7 +18,7 @@ func (f *frontendConfig) handlerAddGamePlatform(w http.ResponseWriter, _ *http.R
 }
 
 func (f *frontendConfig) handlerUpdateGameForm(w http.ResponseWriter, r *http.Request) {
-	gameID := r.URL.Query().Get("id")
+	gameID := r.URL.Query().Get("game_id")
 
 	resp, resperror := f.callAPI(r.Context(), r.Method, "/api/games/"+gameID, nil)
 	if resperror != nil {
@@ -28,26 +27,17 @@ func (f *frontendConfig) handlerUpdateGameForm(w http.ResponseWriter, r *http.Re
 	}
 	defer resp.Body.Close()
 
-	var gameData data.GameData
-	if err := json.NewDecoder(resp.Body).Decode(&gameData); err != nil {
+	var game data.GamePublic
+	if err := json.NewDecoder(resp.Body).Decode(&game); err != nil {
 		data.RespondWithError(w, http.StatusInternalServerError, fmt.Sprintf("Something went wrong: decoding failed for game: %v", gameID))
 		return
 	}
-
-	game := data.GamePublic{
-		ID:          gameData.ID.String(),
-		Title:       gameData.Title,
-		Developer:   gameData.Developer.String,
-		Publisher:   gameData.Publisher.String,
-		ReleaseYear: strconv.Itoa(int(gameData.ReleaseYear.Int32)),
-		Platforms:   gameData.Platforms,
-		Description: gameData.Description.String}
 
 	f.templates.ExecuteTemplate(w, "updateGameForm", game)
 }
 
 func (f *frontendConfig) handlerFrontendAddGame(w http.ResponseWriter, r *http.Request) {
-	var params data.GamePublic
+	var params data.GameForm
 	decoder := json.NewDecoder(r.Body)
 	if err := decoder.Decode(&params); err != nil {
 		data.RespondWithError(w, http.StatusInternalServerError, "Something went wrong")
@@ -56,11 +46,11 @@ func (f *frontendConfig) handlerFrontendAddGame(w http.ResponseWriter, r *http.R
 
 	addGameParams := data.AddGameParams{
 		Title:       params.Title,
-		Developer:   data.ToPgtypeText(params.Developer),
-		Publisher:   data.ToPgtypeText(params.Publisher),
-		ReleaseYear: data.ToPgtypeInt4(params.ReleaseYear),
+		Developer:   data.ToNullableText(params.Developer),
+		Publisher:   data.ToNullableText(params.Publisher),
+		ReleaseYear: data.ToNullableInt(params.ReleaseYear),
 		Platforms:   data.RemoveEmptyValues(params.Platforms),
-		Description: data.ToPgtypeText(params.Description),
+		Description: data.ToNullableText(params.Description),
 	}
 
 	_, resperror := f.callAPI(r.Context(), r.Method, "/api/games", addGameParams)
@@ -74,7 +64,7 @@ func (f *frontendConfig) handlerFrontendAddGame(w http.ResponseWriter, r *http.R
 }
 
 func (f *frontendConfig) handlerFrontendUpdateGame(w http.ResponseWriter, r *http.Request) {
-	var params data.GamePublic
+	var params data.GameForm
 	decoder := json.NewDecoder(r.Body)
 	if err := decoder.Decode(&params); err != nil {
 		data.RespondWithError(w, http.StatusInternalServerError, "Something went wrong")
@@ -85,11 +75,11 @@ func (f *frontendConfig) handlerFrontendUpdateGame(w http.ResponseWriter, r *htt
 	updateGameParams := data.GameData{
 		ID:          gameUUID,
 		Title:       params.Title,
-		Developer:   data.ToPgtypeText(params.Developer),
-		Publisher:   data.ToPgtypeText(params.Publisher),
-		ReleaseYear: data.ToPgtypeInt4(params.ReleaseYear),
+		Developer:   data.ToNullableText(params.Developer),
+		Publisher:   data.ToNullableText(params.Publisher),
+		ReleaseYear: data.ToNullableInt(params.ReleaseYear),
 		Platforms:   data.RemoveEmptyValues(params.Platforms),
-		Description: data.ToPgtypeText(params.Description),
+		Description: data.ToNullableText(params.Description),
 	}
 
 	_, resperror := f.callAPI(r.Context(), r.Method, "/api/games/"+params.ID, updateGameParams)
@@ -99,7 +89,7 @@ func (f *frontendConfig) handlerFrontendUpdateGame(w http.ResponseWriter, r *htt
 	}
 
 	w.Header().Set("HX-Trigger", "gameUpdated")
-	w.WriteHeader(http.StatusNoContent)
+	w.WriteHeader(http.StatusOK)
 }
 
 func (f *frontendConfig) handlerFrontendDeleteGame(w http.ResponseWriter, r *http.Request) {
@@ -112,5 +102,5 @@ func (f *frontendConfig) handlerFrontendDeleteGame(w http.ResponseWriter, r *htt
 	}
 
 	w.Header().Set("HX-Trigger", "gameDeleted")
-	w.WriteHeader(http.StatusNoContent)
+	w.WriteHeader(http.StatusOK)
 }

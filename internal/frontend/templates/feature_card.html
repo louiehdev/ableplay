@@ -2,7 +2,7 @@
 <div class="card">
     <div class="card-header d-flex justify-content-between align-items-center">
         {{.Category}}
-        <button type="button" class="btn-close" aria-label="Close" hx-delete="/features/{{.ID}}" hx-confirm="Are you sure you want to delete this feature from this game?"></button>
+        <button type="button" class="btn-close" aria-label="Close" hx-delete="/features/{{.ID}}" hx-confirm="Are you sure you want to delete this feature?"></button>
     </div>
     <div class="card-body">
         <h5 class="card-title">{{.Name}}</h5>
@@ -10,10 +10,10 @@
     </div>
     <div class="card-body">
         <input type="hidden" id="feature-{{.ID}}" name="feature_id" value="{{.ID}}">
-        <button hx-get="/features/games/list" hx-include="#feature-{{.ID}}" hx-target="#featuresList" hx-swap="innerHTML" class="btn btn-outline-info">
+        <button hx-get="/features/games/list" hx-include="#feature-{{.ID}}" hx-target="#featuresList" hx-swap="innerHTML show:window:top" class="btn btn-outline-info">
         Find Games
         </button>
-        <button hx-get="/features/updateform" hx-include="#feature-{{.ID}}" hx-target="#featuresForm" hx-swap="innerHTML" class="btn btn-outline-secondary">
+        <button hx-get="/features/updateform" hx-include="#feature-{{.ID}}" hx-target="#featuresForm" hx-swap="innerHTML show:window:top" class="btn btn-outline-secondary">
         Update
         </button>
     </div>

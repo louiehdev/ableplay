@@ -27,9 +27,7 @@ func main() {
 	if err := db.Migrate(dbConn); err != nil {
 		log.Fatal(err)
 	}
-	if err := db.Import(dbConn, ctx); err != nil {
-		log.Fatal(err)
-	}
+
 	log.Print("Successfully connected to database!")
 
 	server := http.Server{

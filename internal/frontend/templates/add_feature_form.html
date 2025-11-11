@@ -1,5 +1,5 @@
 {{define "addFeatureForm"}}
-<form hx-ext="json-enc" hx-post="/features/add">
+<form hx-ext="json-enc" hx-post="/features/add" hx-swap="delete">
     <header>
         <h2>Add New Feature</h2>
         <p>Please fill out the form below to add the feature to the database.</p>
@@ -8,7 +8,7 @@
         <label for="name">Feature Name:</label><br>
         <input class="form-control" type="text" id="name" name="name"><br>
         <label for="description">Description:</label><br>
-        <input class="form-control" type="text" id="description" name="description"><br>
+        <textarea class="form-control text-wrap" id="description" name="description" rows="3"></textarea><br>
         <label for="category">Category:</label><br>
         <select class="form-select" id="category" name="category">
             <option value="Visual">Visual</option>

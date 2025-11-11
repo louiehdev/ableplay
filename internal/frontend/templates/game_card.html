@@ -34,13 +34,13 @@
     <div class="card-body">
         <input type="hidden" id="game-{{$game.ID}}" name="game_id" value="{{$game.ID}}">
         <input type="hidden" id="game-{{$game.ID}}-title" name="title" value="{{$game.Title}}">
-        <button hx-get="/games/features/newform" hx-include="#game-{{$game.ID}}, #game-{{$game.ID}}-title" hx-target="#gamesForm" hx-swap="innerHTML" class="btn btn-outline-info">
+        <button hx-get="/games/features/newform" hx-include="#game-{{$game.ID}}, #game-{{$game.ID}}-title" hx-target="#gamesForm" hx-swap="innerHTML show:window:top" class="btn btn-outline-info">
         Add Feature
         </button>
-        <button hx-get="/games/updateform" hx-include="#game-{{$game.ID}}" hx-target="#gamesForm" hx-swap="innerHTML" class="btn btn-outline-secondary">
+        <button hx-get="/games/updateform" hx-include="#game-{{$game.ID}}" hx-target="#gamesForm" hx-swap="innerHTML show:window:top" class="btn btn-outline-secondary">
         Update
         </button>
-        <button hx-delete="/games/{{$game.ID}}" hx-confirm="Are you sure you want to delete this Game?" class="btn btn-outline-danger">
+        <button hx-delete="/games/{{$game.ID}}" hx-confirm="Are you sure you want to delete this game?" class="btn btn-outline-danger">
         Delete
         </button>
     </div>

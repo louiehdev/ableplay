@@ -41,7 +41,10 @@ func (api *apiConfig) handlerGetFeature(w http.ResponseWriter, r *http.Request) 
 }
 
 func (api *apiConfig) handlerGetFeatures(w http.ResponseWriter, r *http.Request) {
-	features, err := api.DB.GetFeatures(r.Context())
+	queryParams := r.URL.Query()
+	limit := data.ParseQueryParams(queryParams)
+
+	features, err := api.DB.GetFeatures(r.Context(), limit)
 	if err != nil {
 		data.RespondWithError(w, http.StatusInternalServerError, "Unable to retrieve features from database")
 		return

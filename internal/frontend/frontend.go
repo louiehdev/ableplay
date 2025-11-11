@@ -50,7 +50,7 @@ func NewService(tmpl *template.Template, apibase, platform string) *http.ServeMu
 	mux.HandleFunc("GET /games/features/list", cfg.handlerFrontendGetGamesFeatures)
 	mux.HandleFunc("GET /features/games/list", cfg.handlerFrontendGetGamesByFeature)
 	mux.HandleFunc("POST /games/features/add", cfg.handlerFrontendAddGameFeature)
-	mux.HandleFunc("DELETE /games/features/delete", cfg.handlerFrontendDeleteGameFeature)
+	mux.HandleFunc("DELETE /games/{gameID}/features/{featureID}", cfg.handlerFrontendDeleteGameFeature)
 
 	return mux
 }
