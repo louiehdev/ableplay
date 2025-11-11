@@ -15,7 +15,7 @@ func (f *frontendConfig) handlerFrontendFeatures(w http.ResponseWriter, _ *http.
 func (f *frontendConfig) handlerFrontendGetFeatures(w http.ResponseWriter, r *http.Request) {
 	resp, err := f.callAPI(r.Context(), r.Method, "/api/features", nil)
 	if err != nil {
-		data.RespondWithError(w, http.StatusInternalServerError, "Failed to fetch features")
+		data.RespondWithError(w, http.StatusInternalServerError, "Failed to fetch features, "+err.Error())
 		return
 	}
 	defer resp.Body.Close()
@@ -35,7 +35,7 @@ func (f *frontendConfig) handlerUpdateFeatureForm(w http.ResponseWriter, r *http
 
 	resp, resperror := f.callAPI(r.Context(), r.Method, "/api/features/"+featureID, nil)
 	if resperror != nil {
-		data.RespondWithError(w, http.StatusInternalServerError, "Failed to fetch feature")
+		data.RespondWithError(w, http.StatusInternalServerError, "Failed to fetch feature, "+resperror.Error())
 		return
 	}
 	defer resp.Body.Close()
@@ -70,7 +70,7 @@ func (f *frontendConfig) handlerFrontendAddFeature(w http.ResponseWriter, r *htt
 
 	_, resperror := f.callAPI(r.Context(), r.Method, "/api/features", addFeatureParams)
 	if resperror != nil {
-		data.RespondWithError(w, http.StatusInternalServerError, "Failed to add feature")
+		data.RespondWithError(w, http.StatusInternalServerError, "Failed to add feature, "+resperror.Error())
 		return
 	}
 
@@ -96,7 +96,7 @@ func (f *frontendConfig) handlerFrontendUpdateFeature(w http.ResponseWriter, r *
 
 	_, resperror := f.callAPI(r.Context(), r.Method, "/api/features/"+params.ID, updateFeatureParams)
 	if resperror != nil {
-		data.RespondWithError(w, http.StatusInternalServerError, "Failed to update feature")
+		data.RespondWithError(w, http.StatusInternalServerError, "Failed to update feature, "+resperror.Error())
 		return
 	}
 
@@ -109,7 +109,7 @@ func (f *frontendConfig) handlerFrontendDeleteFeature(w http.ResponseWriter, r *
 
 	_, resperror := f.callAPI(r.Context(), r.Method, "/api/features/"+featureID, nil)
 	if resperror != nil {
-		data.RespondWithError(w, http.StatusInternalServerError, "Failed to delete feature")
+		data.RespondWithError(w, http.StatusInternalServerError, "Failed to delete feature, "+resperror.Error())
 		return
 	}
 

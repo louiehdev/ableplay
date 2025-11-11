@@ -18,7 +18,7 @@ func (f *frontendConfig) handlerFrontendGetGameFeature(w http.ResponseWriter, r 
 
 	resp, err := f.callAPI(r.Context(), r.Method, "/api/games/"+gameID+"/features/"+featureID, nil)
 	if err != nil {
-		data.RespondWithError(w, http.StatusInternalServerError, "Failed to fetch game feature")
+		data.RespondWithError(w, http.StatusInternalServerError, "Failed to fetch game feature, "+err.Error())
 		return
 	}
 	defer resp.Body.Close()
@@ -32,7 +32,7 @@ func (f *frontendConfig) handlerFrontendGetGameFeature(w http.ResponseWriter, r 
 func (f *frontendConfig) handlerFrontendGetGamesFeatures(w http.ResponseWriter, r *http.Request) {
 	resp, err := f.callAPI(r.Context(), r.Method, "/api/games/features", nil)
 	if err != nil {
-		data.RespondWithError(w, http.StatusInternalServerError, "Failed to fetch games")
+		data.RespondWithError(w, http.StatusInternalServerError, "Failed to fetch games, "+err.Error())
 		return
 	}
 	defer resp.Body.Close()
@@ -48,7 +48,7 @@ func (f *frontendConfig) handlerFrontendGetGamesByFeature(w http.ResponseWriter,
 
 	resp, err := f.callAPI(r.Context(), r.Method, "/api/features/"+featureID+"/games", nil)
 	if err != nil {
-		data.RespondWithError(w, http.StatusInternalServerError, "Failed to fetch games using feature id")
+		data.RespondWithError(w, http.StatusInternalServerError, "Failed to fetch games using feature id, "+err.Error())
 		return
 	}
 	defer resp.Body.Close()
@@ -67,7 +67,7 @@ func (f *frontendConfig) handlerAddGameFeatureForm(w http.ResponseWriter, r *htt
 
 	resp, err := f.callAPI(r.Context(), r.Method, "/api/features", nil)
 	if err != nil {
-		data.RespondWithError(w, http.StatusInternalServerError, "Failed to fetch features")
+		data.RespondWithError(w, http.StatusInternalServerError, "Failed to fetch features, "+err.Error())
 		return
 	}
 	defer resp.Body.Close()
@@ -103,7 +103,7 @@ func (f *frontendConfig) handlerFrontendAddGameFeature(w http.ResponseWriter, r 
 
 	_, resperror := f.callAPI(r.Context(), r.Method, "/api/games/"+params.GameID+"/features", gamefeatureParams)
 	if resperror != nil {
-		data.RespondWithError(w, http.StatusInternalServerError, "Failed to add game feature")
+		data.RespondWithError(w, http.StatusInternalServerError, "Failed to add game feature, "+resperror.Error())
 		return
 	}
 
@@ -117,7 +117,7 @@ func (f *frontendConfig) handlerFrontendDeleteGameFeature(w http.ResponseWriter,
 
 	_, err := f.callAPI(r.Context(), "DELETE", "/api/games/"+gameID+"/features/"+featureID, nil)
 	if err != nil {
-		data.RespondWithError(w, http.StatusInternalServerError, "Failed to delete game feature")
+		data.RespondWithError(w, http.StatusInternalServerError, "Failed to delete game feature, "+err.Error())
 		return
 	}
 

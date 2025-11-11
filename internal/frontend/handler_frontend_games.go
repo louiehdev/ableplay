@@ -55,7 +55,7 @@ func (f *frontendConfig) handlerFrontendAddGame(w http.ResponseWriter, r *http.R
 
 	_, resperror := f.callAPI(r.Context(), r.Method, "/api/games", addGameParams)
 	if resperror != nil {
-		data.RespondWithError(w, http.StatusInternalServerError, "Failed to add game")
+		data.RespondWithError(w, http.StatusInternalServerError, "Failed to add game, "+resperror.Error())
 		return
 	}
 
@@ -84,7 +84,7 @@ func (f *frontendConfig) handlerFrontendUpdateGame(w http.ResponseWriter, r *htt
 
 	_, resperror := f.callAPI(r.Context(), r.Method, "/api/games/"+params.ID, updateGameParams)
 	if resperror != nil {
-		data.RespondWithError(w, http.StatusInternalServerError, "Failed to update game")
+		data.RespondWithError(w, http.StatusInternalServerError, "Failed to update game, "+resperror.Error())
 		return
 	}
 
@@ -97,7 +97,7 @@ func (f *frontendConfig) handlerFrontendDeleteGame(w http.ResponseWriter, r *htt
 
 	_, err := f.callAPI(r.Context(), r.Method, "/api/games/"+gameID, nil)
 	if err != nil {
-		data.RespondWithError(w, http.StatusInternalServerError, "Failed to delete game")
+		data.RespondWithError(w, http.StatusInternalServerError, "Failed to delete game, "+err.Error())
 		return
 	}
 

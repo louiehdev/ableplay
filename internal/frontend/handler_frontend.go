@@ -26,7 +26,7 @@ func (f *frontendConfig) handlerSearch(w http.ResponseWriter, r *http.Request) {
 	case "games":
 		resp, err := f.callAPI(r.Context(), r.Method, "/api/games/search?q="+query, nil)
 		if err != nil {
-			data.RespondWithError(w, http.StatusInternalServerError, "Failed to find any matching games")
+			data.RespondWithError(w, http.StatusInternalServerError, "Failed to find any matching games, "+err.Error())
 			return
 		}
 		defer resp.Body.Close()
@@ -38,7 +38,7 @@ func (f *frontendConfig) handlerSearch(w http.ResponseWriter, r *http.Request) {
 	case "features":
 		resp, err := f.callAPI(r.Context(), r.Method, "/api/features/search?q="+query, nil)
 		if err != nil {
-			data.RespondWithError(w, http.StatusInternalServerError, "Failed to find any matching features")
+			data.RespondWithError(w, http.StatusInternalServerError, "Failed to find any matching features, "+err.Error())
 			return
 		}
 		defer resp.Body.Close()

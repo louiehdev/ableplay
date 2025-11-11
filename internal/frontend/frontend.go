@@ -27,7 +27,6 @@ func NewService(tmpl *template.Template, apibase, platform string) *http.ServeMu
 
 	// Games
 	mux.HandleFunc("GET /games", cfg.handlerFrontendGamesFeatures)
-	mux.HandleFunc("GET /games/", cfg.handlerFrontendGamesFeatures)
 	mux.HandleFunc("GET /games/addformplatform", cfg.handlerAddGamePlatform)
 	mux.HandleFunc("GET /games/newform", cfg.handlerAddGameForm)
 	mux.HandleFunc("GET /games/updateform", cfg.handlerUpdateGameForm)
