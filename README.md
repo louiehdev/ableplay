@@ -11,16 +11,7 @@ Ableplay is a curated video game database that focuses on accessibility features
 - **PostgreSQL backend** for relational data storage
 - Clear separation of concerns between **API service** and **frontend UI**
 
-### How the Services Work
-
-| Service   | Description | Default Port |
-|----------|-------------|--------------|
-| Frontend | Renders HTML pages and calls the API server-side | `9634` |
-| API      | Exposes JSON endpoints for games and features    | `9633` |
-| Database | PostgreSQL instance                              | `5432` |
-
-The frontend server communicates with the API server internally, so calls do **not** require browser-side CORS handling.
-
+## Motivation
 ---
 
 ## Public Demo
@@ -38,7 +29,7 @@ The demo uses the API base of:
 
 ---
 
-## Local Development
+## Quick Start
 
 ### Requirements
 
@@ -66,11 +57,6 @@ Open your browser to:
 
 http://localhost:9634
 
-### API Example Request
-
-```
-GET http://localhost:9633/api/games/features
-```
 **Note:** No games or features are loaded in by default
 
 ### Environment Variables
@@ -84,6 +70,84 @@ Create a .env file in the project root:
     API_BASE=http://api:9633
 
 Docker Compose will load this automatically.
+
+### How the Services Work
+
+| Service   | Description | Default Port |
+|----------|-------------|--------------|
+| Frontend | Renders HTML pages and calls the API server-side | `9634` |
+| API      | Exposes JSON endpoints for games and features    | `9633` |
+| Database | PostgreSQL instance                              | `5432` |
+
+The frontend server communicates with the API server internally, so calls do **not** require browser-side CORS handling.
+
+---
+
+## Usage
+
+|Method|Endpoint|Description|
+|------|--------|-----------|
+|GET|/api/games/{gameID}|Returns details for a single game|
+|GET|/api/games|Returns all games|
+|GET|/api/games/search|Returns all games that wildcard match the provided query|
+|POST|/api/games|Creates a new game|
+|PUT|/api/games/{gameID}|Updates an existing game|
+|DELETE|/api/games/{gameID}|Removes a game|
+|GET|/api/features/{featureID}|Returns details for one feature|
+|GET|/api/features|Returns all features|
+|GET|/api/features/search|Returns all features that wildcard match the provided query|
+|POST|/api/features|Creates a new feature|
+|PUT|/api/features/{featureID}|Updates a feature|
+|DELETE|/api/features/{featureID}|Removes a feature|
+|GET|/api/games/{gameID}/features/{featureID}|Returns details for one game-feature relationship|
+|GET|/api/games/features|Returns all games with their features|
+|GET|/api/games/{gameID}/features|Returns features for one game|
+|GET|/api/features/{featureID}/games|Returns games with a specific feature|
+|POST|/api/games/{gameID}/features|Associates a feature to a game|
+|PUT|/api/games/{gameID}/features/{featureID}|Updates relationship notes / verification|
+|DELETE|/api/games/{gameID}/features/{featureID}|Removes a feature from a game|
+
+### API Example Request
+
+```
+GET http://localhost:9633/api/games/features
+```
+Example response:
+```
+Example response:
+{
+   [
+      {
+         "id":"1234",
+         "title":"Super Mario Sunshine",
+         "developer":"Nintendo EAD",
+         "publisher":"Nintendo",
+         "release_year":2002,
+         "platforms":[
+            "Nintendo GameCube",
+            "Nintendo Switch"
+         ],
+         "description":"A 2002 platforming game where Mario is framed for a crime on the tropical vacation island of 
+          Isle Delfino. He must use his new companion, FLUDD (a water-squirting backpack), to clean up a mysterious 
+          goop that is covering the island while also pursuing the real culprit.",
+         "game_features":[
+            {
+                "id": "4321",
+                "name": "Colorblind Modes",
+                "notes": "Game provides multiple colorblind modes for visual assistance",
+                "verified": true
+            },
+            {
+                "..."
+            }
+         ]
+      },
+      {
+         "..."
+      }
+   ]
+}
+```
 
 ---
 
@@ -141,3 +205,6 @@ Currently the project runs separate frontend and backend servers. A future refac
 
     Docker Compose for local orchestration
 
+## Contributing
+
+If you'd like to contribute, please fork the repository and open a pull request to the `main` branch.
