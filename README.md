@@ -11,7 +11,6 @@ Ableplay is a curated video game database that focuses on accessibility features
 - **PostgreSQL backend** for relational data storage
 - Clear separation of concerns between **API service** and **frontend UI**
 
-## Motivation
 ---
 
 ## Public Demo
@@ -85,6 +84,7 @@ The frontend server communicates with the API server internally, so calls do **n
 
 ## Usage
 
+### API Endpoints
 |Method|Endpoint|Description|
 |------|--------|-----------|
 |GET|/api/games/{gameID}|Returns details for a single game|
@@ -114,7 +114,6 @@ GET http://localhost:9633/api/games/features
 ```
 Example response:
 ```
-Example response:
 {
    [
       {
