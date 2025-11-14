@@ -17,14 +17,14 @@ Ableplay is a curated video game database that focuses on accessibility features
 
 A live demo of Ableplay is available here:
 
-**https://ableplay-frontend-latest.onrender.com**
+**[https://ableplay-frontend-latest.onrender.com](https://ableplay-frontend-latest.onrender.com)**
 
 This demo showcases the core browsing experience and accessibility feature listings.  
-**Note:** Since this is a free-tier deployment, cold starts or slight loading delays may occur.
+**Note:** Since this is a free-tier deployment, cold starts or slight loading delays may occur. If no data populates for the frontend, use the link below to wake up the backend as it may have spun down due to inactivity.
 
 The demo uses the API base of:
 
-**https://ableplay-api-latest.onrender.com**
+**[https://ableplay-api-latest.onrender.com](https://ableplay-api-latest.onrender.com)**
 
 ---
 
