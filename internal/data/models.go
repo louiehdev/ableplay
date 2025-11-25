@@ -8,7 +8,16 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgtype"
 )
+
+type ApiKey struct {
+	ID        string           `json:"id"`
+	ApiKey    string           `json:"api_key"`
+	CreatedAt time.Time        `json:"created_at"`
+	ExpiresAt pgtype.Timestamp `json:"expires_at"`
+	UserID    uuid.UUID        `json:"user_id"`
+}
 
 type Feature struct {
 	ID          uuid.UUID `json:"id"`
@@ -18,6 +27,17 @@ type Feature struct {
 	Description *string   `json:"description"`
 	Category    string    `json:"category"`
 	Slug        *string   `json:"slug"`
+}
+
+type FeaturesChange struct {
+	ID          uuid.UUID `json:"id"`
+	CreatedAt   time.Time `json:"created_at"`
+	Status      string    `json:"status"`
+	UserID      uuid.UUID `json:"user_id"`
+	ModeratorID uuid.UUID `json:"moderator_id"`
+	Name        string    `json:"name"`
+	Description *string   `json:"description"`
+	Category    string    `json:"category"`
 }
 
 type Game struct {
@@ -33,6 +53,20 @@ type Game struct {
 	Slug        *string   `json:"slug"`
 }
 
+type GamesChange struct {
+	ID          uuid.UUID `json:"id"`
+	CreatedAt   time.Time `json:"created_at"`
+	Status      string    `json:"status"`
+	UserID      uuid.UUID `json:"user_id"`
+	ModeratorID uuid.UUID `json:"moderator_id"`
+	Title       string    `json:"title"`
+	Developer   *string   `json:"developer"`
+	Publisher   *string   `json:"publisher"`
+	ReleaseYear *int32    `json:"release_year"`
+	Platforms   []string  `json:"platforms"`
+	Description *string   `json:"description"`
+}
+
 type GamesFeature struct {
 	ID        uuid.UUID `json:"id"`
 	CreatedAt time.Time `json:"created_at"`
@@ -41,6 +75,18 @@ type GamesFeature struct {
 	FeatureID uuid.UUID `json:"feature_id"`
 	Notes     *string   `json:"notes"`
 	Verified  bool      `json:"verified"`
+}
+
+type GamesFeaturesChange struct {
+	ID          uuid.UUID `json:"id"`
+	CreatedAt   time.Time `json:"created_at"`
+	Status      string    `json:"status"`
+	UserID      uuid.UUID `json:"user_id"`
+	ModeratorID uuid.UUID `json:"moderator_id"`
+	GameID      uuid.UUID `json:"game_id"`
+	FeatureID   uuid.UUID `json:"feature_id"`
+	Notes       *string   `json:"notes"`
+	Verified    bool      `json:"verified"`
 }
 
 type Mod struct {
@@ -52,4 +98,15 @@ type Mod struct {
 	Description string    `json:"description"`
 	SourceUrl   string    `json:"source_url"`
 	Verified    bool      `json:"verified"`
+}
+
+type User struct {
+	ID        uuid.UUID `json:"id"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
+	FirstName string    `json:"first_name"`
+	LastName  string    `json:"last_name"`
+	Role      string    `json:"role"`
+	Email     string    `json:"email"`
+	Password  string    `json:"password"`
 }
