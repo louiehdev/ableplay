@@ -12,7 +12,7 @@ SELECT * FROM users
 WHERE id = $1 LIMIT 1;
 
 -- name: GetUserByAPIKey :one
-SELECT users.id, users.first_name, users.last_name, users.role, users.email FROM users
+SELECT users.id, users.created_at, users.updated_at, users.first_name, users.last_name, users.role, users.email, users.password FROM users
 LEFT JOIN api_keys ON users.id = api_keys.user_id
 WHERE api_keys.api_key = $1;
 

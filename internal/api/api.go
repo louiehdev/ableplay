@@ -9,11 +9,12 @@ import (
 
 type apiConfig struct {
 	DB *data.Queries
+	Conn *pgxpool.Pool
 }
 
 func NewService(dbConn *pgxpool.Pool) *http.ServeMux {
 	dbQueries := data.New(dbConn)
-	api := apiConfig{DB: dbQueries}
+	api := apiConfig{DB: dbQueries, Conn: dbConn}
 	mux := http.NewServeMux()
 
 	// Games

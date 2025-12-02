@@ -46,28 +46,23 @@ func (q *Queries) DeleteUser(ctx context.Context, id uuid.UUID) error {
 }
 
 const getUserByAPIKey = `-- name: GetUserByAPIKey :one
-SELECT users.id, users.first_name, users.last_name, users.role, users.email FROM users
+SELECT users.id, users.created_at, users.updated_at, users.first_name, users.last_name, users.role, users.email, users.password FROM users
 LEFT JOIN api_keys ON users.id = api_keys.user_id
 WHERE api_keys.api_key = $1
 `
 
-type GetUserByAPIKeyRow struct {
-	ID        uuid.UUID `json:"id"`
-	FirstName string    `json:"first_name"`
-	LastName  string    `json:"last_name"`
-	Role      string    `json:"role"`
-	Email     string    `json:"email"`
-}
-
-func (q *Queries) GetUserByAPIKey(ctx context.Context, apiKey string) (GetUserByAPIKeyRow, error) {
+func (q *Queries) GetUserByAPIKey(ctx context.Context, apiKey string) (User, error) {
 	row := q.db.QueryRow(ctx, getUserByAPIKey, apiKey)
-	var i GetUserByAPIKeyRow
+	var i User
 	err := row.Scan(
 		&i.ID,
+		&i.CreatedAt,
+		&i.UpdatedAt,
 		&i.FirstName,
 		&i.LastName,
 		&i.Role,
 		&i.Email,
+		&i.Password,
 	)
 	return i, err
 }
