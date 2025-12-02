@@ -46,8 +46,8 @@ func (api *apiConfig) handlerDeleteGameFeature(w http.ResponseWriter, r *http.Re
 }
 
 func (api *apiConfig) handlerGetGamesWithFeatures(w http.ResponseWriter, r *http.Request) {
-	queryParams := r.URL.Query()
-	limit := data.ParseQueryParams(queryParams)
+	queryParams := data.ParseQueryParams(r.URL.Query())
+	limit, _ := queryParams["limit"].(int32)
 
 	games, err := api.DB.GetGamesWithFeatures(r.Context(), limit)
 	if err != nil {

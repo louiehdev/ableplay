@@ -41,8 +41,8 @@ func (api *apiConfig) handlerGetFeature(w http.ResponseWriter, r *http.Request) 
 }
 
 func (api *apiConfig) handlerGetFeatures(w http.ResponseWriter, r *http.Request) {
-	queryParams := r.URL.Query()
-	limit := data.ParseQueryParams(queryParams)
+	queryParams := data.ParseQueryParams(r.URL.Query())
+	limit, _ := queryParams["limit"].(int32)
 
 	features, err := api.DB.GetFeatures(r.Context(), limit)
 	if err != nil {

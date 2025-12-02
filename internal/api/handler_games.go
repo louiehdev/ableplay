@@ -41,8 +41,8 @@ func (api *apiConfig) handlerGetGame(w http.ResponseWriter, r *http.Request) {
 }
 
 func (api *apiConfig) handlerGetGames(w http.ResponseWriter, r *http.Request) {
-	queryParams := r.URL.Query()
-	limit := data.ParseQueryParams(queryParams)
+	queryParams := data.ParseQueryParams(r.URL.Query())
+	limit, _ := queryParams["limit"].(int32)
 
 	games, err := api.DB.GetGames(r.Context(), limit)
 	if err != nil {

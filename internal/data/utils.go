@@ -1,7 +1,9 @@
 package data
 
 import (
+	"context"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"net/url"
@@ -52,24 +54,42 @@ func GetRequestUUID(r *http.Request, idType string) (uuid.UUID, error) {
 	return reqUUID, nil
 }
 
-func ParseQueryParams(values url.Values) (limit int32) {
-	// TO-DO: Allow for greater amount of params and return correct value types
+func ParseQueryParams(values url.Values) map[string]interface{} {
+	queries := make(map[string]interface{}, len(values))
 
-	// Example: queries := make(map[string]interface{}, len(values))
-
-	limit = 50
-
-	if limitStr := values.Get("limit"); limitStr != "" {
-		if l, err := strconv.Atoi(limitStr); err == nil && l > 0 {
-			limit = int32(l)
+	for key := range values {
+		if value := values.Get(key); value != "" {
+			if i, err := strconv.Atoi(value); err == nil {
+				queries[key] = int32(i)
+			} else {
+				queries[key] = string(value)
+			}
 		}
 	}
 
-	if limit > 100 {
-		limit = 100
+	if limit, ok := queries["limit"]; !ok {
+		queries["limit"] = int32(50) // Set limit to default if none provided
+	} else {
+		if num, ok := limit.(int32); ok {
+			if num < 0 {
+				queries["limit"] = int32(50)
+			} else if num > 100 {
+				queries["limit"] = int32(100)
+			}
+		}
 	}
 
-	return limit
+	return queries
+}
+
+func GetContextValue[T any](ctx context.Context, contextKey any) (T, error) {
+	value, ok := ctx.Value(contextKey).(T)
+	if !ok {
+		var zero T
+		return zero, fmt.Errorf("no values found, check key or data type")
+	}
+
+	return value, nil
 }
 
 func ToNullableText(s string) *string {
