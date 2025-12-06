@@ -15,6 +15,8 @@ Ableplay is a curated video game database that focuses on accessibility features
 
 ## Public Demo
 
+**Note: Public Demo is down until auth systems are fully integrated**
+
 A live demo of Ableplay is available here:
 
 **[https://ableplay-frontend-latest.onrender.com](https://ableplay-frontend-latest.onrender.com)**
