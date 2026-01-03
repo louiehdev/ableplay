@@ -12,12 +12,14 @@ import (
 )
 
 const addFeaturesChange = `-- name: AddFeaturesChange :exec
-INSERT INTO features_changes (user_id, name, description, category)
-VALUES ($1, $2, $3, $4)
+INSERT INTO features_changes (id, user_id, change_type, name, description, category)
+VALUES ($1, $2, $3, $4, $5, $6)
 `
 
 type AddFeaturesChangeParams struct {
+	ID          uuid.UUID `json:"id"`
 	UserID      uuid.UUID `json:"user_id"`
+	ChangeType  string    `json:"change_type"`
 	Name        string    `json:"name"`
 	Description *string   `json:"description"`
 	Category    string    `json:"category"`
@@ -25,7 +27,9 @@ type AddFeaturesChangeParams struct {
 
 func (q *Queries) AddFeaturesChange(ctx context.Context, arg AddFeaturesChangeParams) error {
 	_, err := q.db.Exec(ctx, addFeaturesChange,
+		arg.ID,
 		arg.UserID,
+		arg.ChangeType,
 		arg.Name,
 		arg.Description,
 		arg.Category,
@@ -34,12 +38,14 @@ func (q *Queries) AddFeaturesChange(ctx context.Context, arg AddFeaturesChangePa
 }
 
 const addGamesChange = `-- name: AddGamesChange :exec
-INSERT INTO games_changes (user_id, title, developer, publisher, release_year, platforms, description)
-VALUES ($1, $2, $3, $4, $5, $6, $7)
+INSERT INTO games_changes (id, user_id, change_type, title, developer, publisher, release_year, platforms, description)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
 `
 
 type AddGamesChangeParams struct {
+	ID          uuid.UUID `json:"id"`
 	UserID      uuid.UUID `json:"user_id"`
+	ChangeType  string    `json:"change_type"`
 	Title       string    `json:"title"`
 	Developer   *string   `json:"developer"`
 	Publisher   *string   `json:"publisher"`
@@ -50,7 +56,9 @@ type AddGamesChangeParams struct {
 
 func (q *Queries) AddGamesChange(ctx context.Context, arg AddGamesChangeParams) error {
 	_, err := q.db.Exec(ctx, addGamesChange,
+		arg.ID,
 		arg.UserID,
+		arg.ChangeType,
 		arg.Title,
 		arg.Developer,
 		arg.Publisher,
@@ -61,8 +69,36 @@ func (q *Queries) AddGamesChange(ctx context.Context, arg AddGamesChangeParams) 
 	return err
 }
 
+const addGamesFeaturesChange = `-- name: AddGamesFeaturesChange :exec
+INSERT INTO games_features_changes (id, user_id, change_type, game_id, feature_id, notes, verified)
+VALUES ($1, $2, $3, $4, $5, $6, $7)
+`
+
+type AddGamesFeaturesChangeParams struct {
+	ID         uuid.UUID `json:"id"`
+	UserID     uuid.UUID `json:"user_id"`
+	ChangeType string    `json:"change_type"`
+	GameID     uuid.UUID `json:"game_id"`
+	FeatureID  uuid.UUID `json:"feature_id"`
+	Notes      *string   `json:"notes"`
+	Verified   bool      `json:"verified"`
+}
+
+func (q *Queries) AddGamesFeaturesChange(ctx context.Context, arg AddGamesFeaturesChangeParams) error {
+	_, err := q.db.Exec(ctx, addGamesFeaturesChange,
+		arg.ID,
+		arg.UserID,
+		arg.ChangeType,
+		arg.GameID,
+		arg.FeatureID,
+		arg.Notes,
+		arg.Verified,
+	)
+	return err
+}
+
 const getFeaturesChangeByID = `-- name: GetFeaturesChangeByID :one
-SELECT id, created_at, status, user_id, moderator_id, name, description, category FROM features_changes
+SELECT id, created_at, status, change_type, user_id, moderator_id, name, description, category FROM features_changes
 WHERE id = $1
 `
 
@@ -73,6 +109,7 @@ func (q *Queries) GetFeaturesChangeByID(ctx context.Context, id uuid.UUID) (Feat
 		&i.ID,
 		&i.CreatedAt,
 		&i.Status,
+		&i.ChangeType,
 		&i.UserID,
 		&i.ModeratorID,
 		&i.Name,
@@ -83,7 +120,7 @@ func (q *Queries) GetFeaturesChangeByID(ctx context.Context, id uuid.UUID) (Feat
 }
 
 const getFeaturesChanges = `-- name: GetFeaturesChanges :many
-SELECT id, created_at, status, user_id, moderator_id, name, description, category FROM features_changes
+SELECT id, created_at, status, change_type, user_id, moderator_id, name, description, category FROM features_changes
 ORDER BY category DESC
 LIMIT $1
 `
@@ -101,6 +138,7 @@ func (q *Queries) GetFeaturesChanges(ctx context.Context, limit int32) ([]Featur
 			&i.ID,
 			&i.CreatedAt,
 			&i.Status,
+			&i.ChangeType,
 			&i.UserID,
 			&i.ModeratorID,
 			&i.Name,
@@ -118,7 +156,7 @@ func (q *Queries) GetFeaturesChanges(ctx context.Context, limit int32) ([]Featur
 }
 
 const getGamesChangeByID = `-- name: GetGamesChangeByID :one
-SELECT id, created_at, status, user_id, moderator_id, title, developer, publisher, release_year, platforms, description FROM games_changes
+SELECT id, created_at, status, change_type, user_id, moderator_id, title, developer, publisher, release_year, platforms, description FROM games_changes
 WHERE id = $1
 `
 
@@ -129,6 +167,7 @@ func (q *Queries) GetGamesChangeByID(ctx context.Context, id uuid.UUID) (GamesCh
 		&i.ID,
 		&i.CreatedAt,
 		&i.Status,
+		&i.ChangeType,
 		&i.UserID,
 		&i.ModeratorID,
 		&i.Title,
@@ -142,7 +181,7 @@ func (q *Queries) GetGamesChangeByID(ctx context.Context, id uuid.UUID) (GamesCh
 }
 
 const getGamesChanges = `-- name: GetGamesChanges :many
-SELECT id, created_at, status, user_id, moderator_id, title, developer, publisher, release_year, platforms, description FROM games_changes
+SELECT id, created_at, status, change_type, user_id, moderator_id, title, developer, publisher, release_year, platforms, description FROM games_changes
 ORDER BY title
 LIMIT $1
 `
@@ -160,6 +199,7 @@ func (q *Queries) GetGamesChanges(ctx context.Context, limit int32) ([]GamesChan
 			&i.ID,
 			&i.CreatedAt,
 			&i.Status,
+			&i.ChangeType,
 			&i.UserID,
 			&i.ModeratorID,
 			&i.Title,
@@ -168,6 +208,65 @@ func (q *Queries) GetGamesChanges(ctx context.Context, limit int32) ([]GamesChan
 			&i.ReleaseYear,
 			&i.Platforms,
 			&i.Description,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getGamesFeaturesChangeByID = `-- name: GetGamesFeaturesChangeByID :one
+SELECT id, created_at, status, change_type, user_id, moderator_id, game_id, feature_id, notes, verified FROM games_features_changes
+WHERE id = $1
+`
+
+func (q *Queries) GetGamesFeaturesChangeByID(ctx context.Context, id uuid.UUID) (GamesFeaturesChange, error) {
+	row := q.db.QueryRow(ctx, getGamesFeaturesChangeByID, id)
+	var i GamesFeaturesChange
+	err := row.Scan(
+		&i.ID,
+		&i.CreatedAt,
+		&i.Status,
+		&i.ChangeType,
+		&i.UserID,
+		&i.ModeratorID,
+		&i.GameID,
+		&i.FeatureID,
+		&i.Notes,
+		&i.Verified,
+	)
+	return i, err
+}
+
+const getGamesFeaturesChanges = `-- name: GetGamesFeaturesChanges :many
+SELECT id, created_at, status, change_type, user_id, moderator_id, game_id, feature_id, notes, verified FROM games_features_changes
+LIMIT $1
+`
+
+func (q *Queries) GetGamesFeaturesChanges(ctx context.Context, limit int32) ([]GamesFeaturesChange, error) {
+	rows, err := q.db.Query(ctx, getGamesFeaturesChanges, limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GamesFeaturesChange
+	for rows.Next() {
+		var i GamesFeaturesChange
+		if err := rows.Scan(
+			&i.ID,
+			&i.CreatedAt,
+			&i.Status,
+			&i.ChangeType,
+			&i.UserID,
+			&i.ModeratorID,
+			&i.GameID,
+			&i.FeatureID,
+			&i.Notes,
+			&i.Verified,
 		); err != nil {
 			return nil, err
 		}
@@ -218,6 +317,24 @@ func (q *Queries) SubmitGamesChange(ctx context.Context, id uuid.UUID) error {
 	return err
 }
 
+const submitGamesFeaturesChange = `-- name: SubmitGamesFeaturesChange :exec
+INSERT INTO games_features (id, updated_at, game_id, feature_id, notes, verified)
+SELECT 
+    games_features_changes.id,
+    NOW(),
+    games_features_changes.game_id,
+    games_features_changes.feature_id, 
+    games_features_changes.notes, 
+    games_features_changes.verified
+FROM games_features_changes
+WHERE games_features_changes.id = $1
+`
+
+func (q *Queries) SubmitGamesFeaturesChange(ctx context.Context, id uuid.UUID) error {
+	_, err := q.db.Exec(ctx, submitGamesFeaturesChange, id)
+	return err
+}
+
 const updateFeaturesChange = `-- name: UpdateFeaturesChange :exec
 UPDATE features_changes SET 
     status = $2,
@@ -251,5 +368,23 @@ type UpdateGamesChangeParams struct {
 
 func (q *Queries) UpdateGamesChange(ctx context.Context, arg UpdateGamesChangeParams) error {
 	_, err := q.db.Exec(ctx, updateGamesChange, arg.ID, arg.Status, arg.ModeratorID)
+	return err
+}
+
+const updateGamesFeaturesChange = `-- name: UpdateGamesFeaturesChange :exec
+UPDATE games_features_changes SET 
+    status = $2,
+    moderator_id = $3
+WHERE id = $1
+`
+
+type UpdateGamesFeaturesChangeParams struct {
+	ID          uuid.UUID `json:"id"`
+	Status      string    `json:"status"`
+	ModeratorID uuid.UUID `json:"moderator_id"`
+}
+
+func (q *Queries) UpdateGamesFeaturesChange(ctx context.Context, arg UpdateGamesFeaturesChangeParams) error {
+	_, err := q.db.Exec(ctx, updateGamesFeaturesChange, arg.ID, arg.Status, arg.ModeratorID)
 	return err
 }

@@ -11,28 +11,38 @@ import (
 	"github.com/google/uuid"
 )
 
-const addUser = `-- name: AddUser :exec
-INSERT INTO users (created_at, updated_at, first_name, last_name, role, email, password)
-VALUES (NOW(), NOW(), $1, $2, $3, $4, $5)
+const addUser = `-- name: AddUser :one
+INSERT INTO users (created_at, updated_at, first_name, last_name, email, password)
+VALUES (NOW(), NOW(), $1, $2, $3, $4)
+RETURNING id, created_at, updated_at, first_name, last_name, role, email, password
 `
 
 type AddUserParams struct {
 	FirstName string `json:"first_name"`
 	LastName  string `json:"last_name"`
-	Role      string `json:"role"`
 	Email     string `json:"email"`
 	Password  string `json:"password"`
 }
 
-func (q *Queries) AddUser(ctx context.Context, arg AddUserParams) error {
-	_, err := q.db.Exec(ctx, addUser,
+func (q *Queries) AddUser(ctx context.Context, arg AddUserParams) (User, error) {
+	row := q.db.QueryRow(ctx, addUser,
 		arg.FirstName,
 		arg.LastName,
-		arg.Role,
 		arg.Email,
 		arg.Password,
 	)
-	return err
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.FirstName,
+		&i.LastName,
+		&i.Role,
+		&i.Email,
+		&i.Password,
+	)
+	return i, err
 }
 
 const deleteUser = `-- name: DeleteUser :exec
@@ -144,34 +154,60 @@ func (q *Queries) GetUsers(ctx context.Context, limit int32) ([]User, error) {
 	return items, nil
 }
 
-const updateUser = `-- name: UpdateUser :exec
+const updateUser = `-- name: UpdateUser :one
 UPDATE users SET 
     updated_at = NOW(),
     first_name = $2,
     last_name = $3,
-    role = $4,
-    email = $5,
-    password = $6
+    email = $4,
+    password = $5
 WHERE id = $1
+RETURNING id, created_at, updated_at, first_name, last_name, role, email, password
 `
 
 type UpdateUserParams struct {
 	ID        uuid.UUID `json:"id"`
 	FirstName string    `json:"first_name"`
 	LastName  string    `json:"last_name"`
-	Role      string    `json:"role"`
 	Email     string    `json:"email"`
 	Password  string    `json:"password"`
 }
 
-func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) error {
-	_, err := q.db.Exec(ctx, updateUser,
+func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (User, error) {
+	row := q.db.QueryRow(ctx, updateUser,
 		arg.ID,
 		arg.FirstName,
 		arg.LastName,
-		arg.Role,
 		arg.Email,
 		arg.Password,
 	)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.FirstName,
+		&i.LastName,
+		&i.Role,
+		&i.Email,
+		&i.Password,
+	)
+	return i, err
+}
+
+const upgradeUser = `-- name: UpgradeUser :exec
+UPDATE users SET
+    updated_at = NOW(),
+    role = $2
+WHERE id = $1
+`
+
+type UpgradeUserParams struct {
+	ID   uuid.UUID `json:"id"`
+	Role string    `json:"role"`
+}
+
+func (q *Queries) UpgradeUser(ctx context.Context, arg UpgradeUserParams) error {
+	_, err := q.db.Exec(ctx, upgradeUser, arg.ID, arg.Role)
 	return err
 }

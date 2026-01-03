@@ -1,6 +1,7 @@
--- name: AddUser :exec
-INSERT INTO users (created_at, updated_at, first_name, last_name, role, email, password)
-VALUES (NOW(), NOW(), $1, $2, $3, $4, $5);
+-- name: AddUser :one
+INSERT INTO users (created_at, updated_at, first_name, last_name, email, password)
+VALUES (NOW(), NOW(), $1, $2, $3, $4)
+RETURNING *;
 
 -- name: GetUsers :many
 SELECT * FROM users
@@ -20,14 +21,20 @@ WHERE api_keys.api_key = $1;
 SELECT * FROM users
 WHERE email = $1;
 
--- name: UpdateUser :exec
+-- name: UpdateUser :one
 UPDATE users SET 
     updated_at = NOW(),
     first_name = $2,
     last_name = $3,
-    role = $4,
-    email = $5,
-    password = $6
+    email = $4,
+    password = $5
+WHERE id = $1
+RETURNING *;
+
+-- name: UpgradeUser :exec
+UPDATE users SET
+    updated_at = NOW(),
+    role = $2
 WHERE id = $1;
 
 -- name: DeleteUser :exec

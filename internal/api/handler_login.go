@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"encoding/json"
 	"net/http"
 
@@ -28,12 +29,23 @@ func (api *apiConfig) handlerCreateUser(w http.ResponseWriter, r *http.Request) 
 	}
 	params.Password = hashedPassword
 
-	if err := api.DB.AddUser(r.Context(), params); err != nil {
+	user, err := api.DB.AddUser(r.Context(), params)
+	if err != nil {
 		data.RespondWithError(w, http.StatusInternalServerError, "Unable to add user to database, "+err.Error())
 		return
 	}
+	apiKey, err := generateAPIKey(r.Context(), api.DB, user)
+	if err != nil {
+		data.RespondWithError(w, http.StatusInternalServerError, "could not create API Key, "+err.Error())
+		return
+	}
+	userData := struct{
+		User data.User 
+		APIKey string}{
+			User: user, 
+			APIKey: apiKey}
 
-	w.WriteHeader(http.StatusCreated)
+	data.RespondWithJSON(w, http.StatusOK, userData)
 }
 
 func (api *apiConfig) handlerUpdateUser(w http.ResponseWriter, r *http.Request) {
@@ -53,15 +65,16 @@ func (api *apiConfig) handlerUpdateUser(w http.ResponseWriter, r *http.Request) 
 		params.Password = hashedPassword
 	}
 
-	if err := api.DB.UpdateUser(r.Context(), params); err != nil {
+	user, err := api.DB.UpdateUser(r.Context(), params)
+	if err != nil {
 		data.RespondWithError(w, http.StatusInternalServerError, "Unable to update user in database, "+err.Error())
 		return
 	}
 
-	w.WriteHeader(http.StatusOK)
+	data.RespondWithJSON(w, http.StatusOK, user)
 }
 
-func (api *apiConfig) handlerLogin(w http.ResponseWriter, r *http.Request) {
+func (api *apiConfig) handlerLogin(w http.ResponseWriter, r *http.Request) { // Add raw API key to cookie for frontend use, make sure to set SameSite and HTTPOnly and Secure
 	var params struct {
 		Email    string `json:"email"`
 		Password string `json:"password"`
@@ -107,17 +120,25 @@ func (api *apiConfig) handlerCreateAPIKey(w http.ResponseWriter, r *http.Request
 		return
 	}
 
+	apiKey, err := generateAPIKey(r.Context(), api.DB, user)
+	if err != nil {
+		data.RespondWithError(w, http.StatusInternalServerError, "could not create API Key, "+err.Error())
+		return
+	}
+
+	data.RespondWithJSON(w, http.StatusCreated, apiKey)
+}
+
+func generateAPIKey(ctx context.Context, db *data.Queries, user data.User) (string, error) {
 	apiKey, keyPrefix := auth.CreateAPIKey()
 	hashedKey, err := auth.CreateHash(apiKey)
 	if err != nil {
-		data.RespondWithError(w, http.StatusInternalServerError, "Could not create API Key, "+err.Error())
-		return
+		return "", err
 	}
 
-	if _, err := api.DB.CreateKey(r.Context(), data.CreateKeyParams{ID: keyPrefix, ApiKey: hashedKey, UserID: user.ID}); err != nil {
-		data.RespondWithError(w, http.StatusInternalServerError, "Unable to add key to database, "+err.Error())
-		return
+	if _, err := db.CreateKey(ctx, data.CreateKeyParams{ID: keyPrefix, ApiKey: hashedKey, UserID: user.ID}); err != nil {
+		return "", err
 	}
 
-	w.WriteHeader(http.StatusCreated)
+	return apiKey, nil
 }

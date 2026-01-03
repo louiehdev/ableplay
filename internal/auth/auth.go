@@ -1,7 +1,5 @@
 package auth
 
-// Look at https://docs.sqlc.dev/en/latest/howto/transactions.html for how to do sql transactions for submitting changes and updating the change status at the same time
-
 import (
 	"crypto/rand"
 	"encoding/base64"

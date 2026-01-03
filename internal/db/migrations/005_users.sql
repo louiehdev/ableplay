@@ -5,7 +5,7 @@ CREATE TABLE users (
     updated_at TIMESTAMP NOT NULL,
     first_name TEXT NOT NULL,
     last_name TEXT NOT NULL,
-    role TEXT NOT NULL DEFAULT 'user',
+    role TEXT NOT NULL DEFAULT 'user' CHECK (role IN ('user', 'moderator', 'admin')),
     email TEXT UNIQUE NOT NULL,
     password TEXT NOT NULL
 );

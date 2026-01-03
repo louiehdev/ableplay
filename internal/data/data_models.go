@@ -87,3 +87,12 @@ type GameByFeaturePublic struct {
 	Platforms   []string `json:"platforms"`
 	Description *string  `json:"description"`
 }
+
+type SubmitChangeParams struct {
+	ChangeID uuid.UUID `json:"id"`
+	UserID   uuid.UUID `json:"user_id"`
+	Category string    `json:"category"`
+	Type     string    `json:"type"`
+	Status   string    `json:"status"`
+	Data     any       `json:"data"`
+}

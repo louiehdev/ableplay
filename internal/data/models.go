@@ -33,6 +33,7 @@ type FeaturesChange struct {
 	ID          uuid.UUID `json:"id"`
 	CreatedAt   time.Time `json:"created_at"`
 	Status      string    `json:"status"`
+	ChangeType  string    `json:"change_type"`
 	UserID      uuid.UUID `json:"user_id"`
 	ModeratorID uuid.UUID `json:"moderator_id"`
 	Name        string    `json:"name"`
@@ -57,6 +58,7 @@ type GamesChange struct {
 	ID          uuid.UUID `json:"id"`
 	CreatedAt   time.Time `json:"created_at"`
 	Status      string    `json:"status"`
+	ChangeType  string    `json:"change_type"`
 	UserID      uuid.UUID `json:"user_id"`
 	ModeratorID uuid.UUID `json:"moderator_id"`
 	Title       string    `json:"title"`
@@ -81,6 +83,7 @@ type GamesFeaturesChange struct {
 	ID          uuid.UUID `json:"id"`
 	CreatedAt   time.Time `json:"created_at"`
 	Status      string    `json:"status"`
+	ChangeType  string    `json:"change_type"`
 	UserID      uuid.UUID `json:"user_id"`
 	ModeratorID uuid.UUID `json:"moderator_id"`
 	GameID      uuid.UUID `json:"game_id"`

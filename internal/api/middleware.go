@@ -12,8 +12,8 @@ type contextKey string
 
 const userContextKey = contextKey("user")
 
-func (api *apiConfig) RequireRole(minRole string) func(http.Handler) http.HandlerFunc {
-	return func(next http.Handler) http.HandlerFunc {
+func (api *apiConfig) RequireRole(minRole string) func(http.HandlerFunc) http.HandlerFunc {
+	return func(next http.HandlerFunc) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {
 
 			// 1. Extract API key

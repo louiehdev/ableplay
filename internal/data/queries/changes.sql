@@ -1,6 +1,6 @@
 -- name: AddGamesChange :exec
-INSERT INTO games_changes (user_id, title, developer, publisher, release_year, platforms, description)
-VALUES ($1, $2, $3, $4, $5, $6, $7);
+INSERT INTO games_changes (id, user_id, change_type, title, developer, publisher, release_year, platforms, description)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9);
 
 -- name: SubmitGamesChange :exec
 INSERT INTO games (id, title, developer, publisher, release_year, platforms, description, slug)
@@ -33,8 +33,8 @@ UPDATE games_changes SET
 WHERE id = $1;
 
 -- name: AddFeaturesChange :exec
-INSERT INTO features_changes (user_id, name, description, category)
-VALUES ($1, $2, $3, $4);
+INSERT INTO features_changes (id, user_id, change_type, name, description, category)
+VALUES ($1, $2, $3, $4, $5, $6);
 
 -- name: SubmitFeaturesChange :exec
 INSERT INTO features (id, name, description, category, slug)
@@ -59,6 +59,36 @@ WHERE id = $1;
 
 -- name: UpdateFeaturesChange :exec
 UPDATE features_changes SET 
+    status = $2,
+    moderator_id = $3
+WHERE id = $1;
+
+-- name: AddGamesFeaturesChange :exec
+INSERT INTO games_features_changes (id, user_id, change_type, game_id, feature_id, notes, verified)
+VALUES ($1, $2, $3, $4, $5, $6, $7);
+
+-- name: SubmitGamesFeaturesChange :exec
+INSERT INTO games_features (id, updated_at, game_id, feature_id, notes, verified)
+SELECT 
+    games_features_changes.id,
+    NOW(),
+    games_features_changes.game_id,
+    games_features_changes.feature_id, 
+    games_features_changes.notes, 
+    games_features_changes.verified
+FROM games_features_changes
+WHERE games_features_changes.id = $1;
+
+-- name: GetGamesFeaturesChanges :many
+SELECT * FROM games_features_changes
+LIMIT $1;
+
+-- name: GetGamesFeaturesChangeByID :one
+SELECT * FROM games_features_changes
+WHERE id = $1;
+
+-- name: UpdateGamesFeaturesChange :exec
+UPDATE games_features_changes SET 
     status = $2,
     moderator_id = $3
 WHERE id = $1;

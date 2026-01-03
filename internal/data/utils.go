@@ -12,7 +12,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func RespondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
+func RespondWithJSON(w http.ResponseWriter, code int, payload any) {
 	jsonData, err := json.Marshal(payload)
 	if err != nil {
 		log.Printf("Error marshalling payload: %s", err)
@@ -55,7 +55,7 @@ func GetRequestUUID(r *http.Request, idType string) (uuid.UUID, error) {
 }
 
 func ParseQueryParams(values url.Values) map[string]interface{} {
-	queries := make(map[string]interface{}, len(values))
+	queries := make(map[string]any, len(values))
 
 	for key := range values {
 		if value := values.Get(key); value != "" {
